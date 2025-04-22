@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# S1185: Overriding members should do more than simply call the same member in the base class
+dotnet_diagnostic.S1185.severity = silent
