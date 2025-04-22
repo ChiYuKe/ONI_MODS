@@ -172,7 +172,7 @@ public class AutoPlantHarvester : KMonoBehaviour
         }
 
 
-
+        // 
       
         Debug.Log($"是否已完全成熟: {growingComponent.IsGrown()}");
         Debug.Log($"是否可以继续成长: {growingComponent.CanGrow()}");
