@@ -59,6 +59,7 @@ namespace AutomaticHarvest
             AddVisualizer(go, false);
             go.AddComponent<AutoPlantHarvester>();
             go.AddComponent<Storage>().capacityKg = 50000f;
+
         }
 
        
