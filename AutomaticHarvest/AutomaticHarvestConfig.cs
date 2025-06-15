@@ -28,6 +28,9 @@ namespace AutomaticHarvest
             buildingDef.AudioCategory = "Metal";
             buildingDef.BaseTimeUntilRepair = -1f;
             // buildingDef.ViewMode = OverlayModes.Temperature.ID;
+
+            buildingDef.OutputConduitType = ConduitType.Solid;
+            buildingDef.UtilityOutputOffset = new CellOffset(0, 0);
             buildingDef.DefaultAnimState = "off";
             buildingDef.ObjectLayer = ObjectLayer.Backwall;
             buildingDef.SceneLayer = Grid.SceneLayer.Backwall;
@@ -56,9 +59,29 @@ namespace AutomaticHarvest
         {    
             BuildingConfigManager.Instance.IgnoreDefaultKComponent(typeof(RequiresFoundation), prefab_tag);
 
+            GeneratedBuildings.MakeBuildingAlwaysOperational(go);
+           
+
             AddVisualizer(go, false);
+
+
             go.AddComponent<AutoPlantHarvester>();
-            go.AddComponent<Storage>().capacityKg = 50000f;
+            //List<Tag> list = new List<Tag>();
+            //list.AddRange(STORAGEFILTERS.STORAGE_LOCKERS_STANDARD);
+            //list.AddRange(STORAGEFILTERS.FOOD);
+            Storage storage = go.AddOrGet<Storage>();
+            storage.capacityKg = 100000f;
+            storage.showInUI = true;
+            storage.showDescriptor = true;
+            storage.storageFilters = STORAGEFILTERS.STORAGE_LOCKERS_STANDARD;
+            storage.allowItemRemoval = false;
+            storage.onlyTransferFromLowerPriority = true;
+           
+            storage.showCapacityAsMainStatus = true;
+
+            go.AddOrGet<SolidConduitInbox>();
+            go.AddOrGet<SolidConduitDispenser>();
+
 
         }
 

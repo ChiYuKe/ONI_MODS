@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Klei.AI;
-using KModTool;
 using UnityEngine;
 using static STRINGS.CREATURES.STATS;
 
@@ -29,6 +28,10 @@ public class AutoPlantHarvester : KMonoBehaviour
         // listenerEntry = GameScenePartitioner.Instance.Add("AutoPlantHarvester", gameObject, Grid.PosToCell(transform.GetPosition()), GameScenePartitioner.Instance.pickupablesLayer, OnItemSpawned);
     }
 
+
+    private bool isProcessingNewFruits = false; // 用于标识是否已经开始处理新果实
+
+
     // 扫描范围内的植物，并执行收获
     private void ScanAndHarvestPlants()
     {
@@ -41,7 +44,8 @@ public class AutoPlantHarvester : KMonoBehaviour
         var cells = ListPool<int, AutoPlantHarvester>.Allocate();
         var plantEntries = ListPool<ScenePartitionerEntry, AutoPlantHarvester>.Allocate();
 
-        HashSet<GameObject> uniquePlants = new HashSet<GameObject>(); // 用于去重植物对象
+        // 用于存储去重的植物对象
+        HashSet<GameObject> uniquePlants = new HashSet<GameObject>();
 
         try
         {
@@ -53,28 +57,28 @@ public class AutoPlantHarvester : KMonoBehaviour
             {
                 int targetCell = cells[i];
 
-              
-                if (!KModGridUtilities.IsLineOfSightBlocked(currentCell, targetCell, visualizer))
+                // 检查目标格子是否可见，若遮挡则跳过
+                if (LineOfSightUtils.IsLineOfSightBlocked(currentCell, targetCell, visualizer))
                     continue;
 
-                // 获取格子的 X,Y 坐标
+                // 获取目标格子的 X, Y 坐标
                 Grid.CellToXY(targetCell, out int cellX, out int cellY);
 
-                // 获取该区域内注册在 plant 层的物体（即植物）
+                // 获取该区域内注册在 plant 层的所有物体（即植物）
                 GameScenePartitioner.Instance.GatherEntries(cellX, cellY, 1, 1, GameScenePartitioner.Instance.plants, plantEntries);
             }
 
-            // 遍历找到的植物条目，转为 GameObject 并添加到去重集合
+            // 遍历所有找到的植物条目，转为 GameObject 并去重
             foreach (var entry in plantEntries)
             {
-                GameObject plantGO = KGameObjectUtil.SafeGetGameObject(entry.obj);
+                GameObject plantGO = SafeGetGameObject(entry.obj);
                 if (plantGO != null)
-                    uniquePlants.Add(plantGO);
+                    uniquePlants.Add(plantGO); // 去重，防止重复收获相同的植物
             }
 
             Debug.Log($"[AutoPlantHarvester] 去重后植物数量: {uniquePlants.Count}");
 
-            // 遍历所有可收获的植物
+            // 遍历所有去重后的植物，进行收获
             foreach (GameObject plantGO in uniquePlants)
             {
                 if (plantGO == null)
@@ -85,15 +89,16 @@ public class AutoPlantHarvester : KMonoBehaviour
 
                 if (harvestable != null)
                 {
+                    // 调试输出植物的成长状态
                     DebugInfo(plantGO);
-                    Addvalue(plantGO, 0.1f);
+
+                    // 加速植物成长
+                    Addvalue(plantGO, growthSpeedMultiplier);
 
                     // 如果植物可以收获，且希望禁止复制人干预
                     if (harvestable.CanBeHarvested)
                     {
                         Debug.Log($"✅ 可收获: {plantGO.name}");
-
-                        
 
                         // 1. 取消收获任务
                         if (harvestable.HasChore())
@@ -122,21 +127,7 @@ public class AutoPlantHarvester : KMonoBehaviour
                         {
                             harvestable.Harvest(); // 执行收获逻辑
                             Debug.Log($"✅ 成功收获: {plantGO.name}");
-
-                            // 收获成功后等待一帧，然后处理新生成的 pickupables
-                            StartCoroutine(HandleNewFruitsAfterHarvest());
-
-
-
-                            // 获取掉落的果实并让它飞向建筑
-                            Pickupable pickupable = plantGO.GetComponent<Pickupable>();
-                            if (pickupable != null && IsFruit(pickupable))
-                            {
-                                StartCoroutine(ParabolicMoveCoroutine(plantGO));
-                            }
-
-
-
+                          
 
 
 
@@ -148,8 +139,6 @@ public class AutoPlantHarvester : KMonoBehaviour
                     }
                     else
                     {
-                       
-
                         Debug.Log($"❌ 未成熟: {plantGO.name}");
                     }
                 }
@@ -158,7 +147,6 @@ public class AutoPlantHarvester : KMonoBehaviour
                     Debug.Log($"⚠️ 无 Harvestable 组件: {plantGO.name}");
                 }
             }
-
         }
         finally
         {
@@ -169,96 +157,31 @@ public class AutoPlantHarvester : KMonoBehaviour
     }
 
 
-    private IEnumerator HandleNewFruitsAfterHarvest()
+
+
+    public static GameObject SafeGetGameObject(object obj)
     {
-        // 分配用于存储场景中注册的 Pickupable 条目（使用对象池）
-        var nearbyPickupables = ListPool<ScenePartitionerEntry, AutoPlantHarvester>.Allocate();
-        var PickupableCells = ListPool<int, AutoPlantHarvester>.Allocate();
+        if (obj == null)
+            return null;
 
-        // 等待一帧或一段时间，确保 Harvest() 生成的果实已经出生
-        yield return new WaitForSeconds(0.1f); // 也可以是 yield return null;
+        // 直接是 GameObject
+        GameObject go = obj as GameObject;
+        if (go != null)
+            return go;
 
-        // 获取当前建筑所在的格子
-        int currentCell = Grid.PosToCell(transform.GetPosition());
-        if (!Grid.IsValidCell(currentCell))
-        {
-            yield break;
-        }
+        // 是 Pickupable
+        Pickupable pickupable = obj as Pickupable;
+        if (pickupable != null)
+            return pickupable.gameObject;
 
-        // 获取当前格子为中心，半径范围内的非固体格子
-        GameUtil.GetNonSolidCells(currentCell, radius, PickupableCells);
+        // 是 KPrefabID
+        KPrefabID kprefabID = obj as KPrefabID;
+        if (kprefabID != null)
+            return kprefabID.gameObject;
 
-
-
-        Debug.Log($"[AutoPlantHarvester] cells列表长度: {PickupableCells.Count}");
-
-        // 遍历所有目标格子
-        for (int i = 0; i < PickupableCells.Count; i++)
-        {
-            int targetCell = PickupableCells[i];
-
-            // 判断视线是否被遮挡（若遮挡则跳过）
-            if (!KModGridUtilities.IsLineOfSightBlocked(currentCell, targetCell, visualizer))
-                continue;
-
-            // 获取格子的 XY 坐标（ScenePartitioner 使用的是 XY）
-            Grid.CellToXY(targetCell, out int cellX, out int cellY);
-
-            // 在该格子区域（1x1）内收集所有 Pickupable 条目
-            GameScenePartitioner.Instance.GatherEntries(
-                cellX, cellY, 1, 1,
-                GameScenePartitioner.Instance.pickupablesLayer,
-                nearbyPickupables
-            );
-
-            Debug.Log($"[AutoPlantHarvester] 列表长度: {nearbyPickupables.Count}");
-        }
-
-        try
-        {
-            // 遍历所有找到的物体
-            foreach (var entry in nearbyPickupables)
-            {
-                // 安全地获取 GameObject 实例
-                GameObject obj = KGameObjectUtil.SafeGetGameObject(entry.obj);
-                if (obj == null) continue;
-
-                Debug.Log($"[AutoPlantHarvester] 发现新果实: {obj.name}");
-
-                // 尝试获取 Pickupable 组件
-                Pickupable pickup = obj.GetComponent<Pickupable>();
-                if (pickup != null && IsFruit(pickup)) // 判断是否是果实
-                {
-                    // 启动飞行动画（抛物线运动）
-                    StartCoroutine(ParabolicMoveCoroutine(pickup.gameObject));
-                }
-            }
-        }
-        finally
-        {
-            // 回收对象池资源，避免 GC 压力
-            nearbyPickupables.Recycle();
-            PickupableCells.Recycle();
-
-
-        }
+        // 其他情况
+        return null;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     public void DebugInfo(GameObject targetObject)
     {
@@ -295,8 +218,6 @@ public class AutoPlantHarvester : KMonoBehaviour
         Debug.Log($"是否正在成长: {growingComponent.IsGrowing()}");
         Debug.Log($"家养植物成长时间: {growingComponent.DomesticGrowthTime()}");
         Debug.Log($"野生植物成长时间: {growingComponent.WildGrowthTime()}");
-       
-
         Debug.Log($"是否已经达到下一个收获期: {growingComponent.ReachedNextHarvest()}");
       
     }
@@ -340,79 +261,5 @@ public class AutoPlantHarvester : KMonoBehaviour
         }
 
     }
-
-
-    private bool IsFruit(Pickupable pickup)
-    {
-        // pickup.HasTag(GameTags.Edible)
-
-        return true;
-    }
-
-    private IEnumerator ParabolicMoveCoroutine(GameObject fruit)
-    {
-        // 获取 Pickupable 组件
-        Pickupable pickupable = fruit.GetComponent<Pickupable>();
-        if (pickupable == null)
-        {
-            Debug.LogWarning("无法找到 Pickupable 组件，无法让物品飞行！");
-            yield break; // 终止协程
-        }
-
-        Vector3 startPos = fruit.transform.position;
-        Vector3 targetPos = transform.position; // 目标建筑的位置
-        float timeToReachTarget = 1f; // 飞行持续时间
-        float elapsedTime = 0f;
-
-        float height = 2f; // 最大高度（可以调整）
-
-        while (elapsedTime < timeToReachTarget)
-        {
-            elapsedTime += Time.deltaTime;
-            float fraction = elapsedTime / timeToReachTarget;
-
-            // 计算当前的抛物线高度（模拟重力）
-            float heightOffset = Mathf.Sin(fraction * Mathf.PI) * height;
-
-            // 使用 Lerp 计算水平移动
-            float horizontalFraction = fraction;
-            Vector3 horizontalMovement = Vector3.Lerp(startPos, targetPos, horizontalFraction);
-
-            // 组合水平移动和垂直高度
-            fruit.transform.position = new Vector3(horizontalMovement.x, startPos.y + heightOffset, horizontalMovement.z);
-
-            yield return null; // 等待下一帧
-        }
-
-        // 确保物品准确到达目标位置
-        fruit.transform.position = targetPos;
-
-        // 动画结束后储存物品
-        StoreFruit(fruit);
-    }
-
-
-
-
-
-    private void StoreFruit(GameObject fruit)
-    {
-        Storage storage = GetComponent<Storage>();
-        if (storage != null)
-        {
-            storage.Store(fruit.gameObject);
-            Debug.Log($"✅ 果实已成功储存: {fruit.name}");
-        }
-        else
-        {
-            Debug.LogWarning("⚠️ 未找到 Storage 组件，无法储存果实！");
-        }
-    }
-
-
-
-
-
-
 
 }
