@@ -41,8 +41,59 @@ namespace VignetteBegone
                 }
 
                 AddCustomButton(redAlertButton, "icon_category_lights_disabled", "切换关闭屏幕晕影", OnClickButton1);
-                HandleButtonClick();
 
+                // 读取保存的状态
+                int savedState = PlayerPrefs.GetInt("VignetteHidden", 1); 
+                vignetteHidden = savedState == 1;
+
+               
+                if (vignetteHidden && Vignette.Instance != null)
+                {
+                    SetVignetteAlpha(0f);
+                    UpdateCustomButtonState(1);
+                }
+                // Game.Instance.Subscribe((int)GameHashes.ExitedRedAlert, OnAlertExited);
+                // Game.Instance.Subscribe((int)GameHashes.ExitedYellowAlert, OnAlertExited);
+            }
+
+            private static void OnAlertExited(object data)
+            {
+                if (vignetteHidden && Vignette.Instance != null)
+                {
+                    var alertManager = ClusterManager.Instance.activeWorld.AlertManager;
+                    if (alertManager == null) return;
+
+                    if (!alertManager.IsRedAlert() && !alertManager.IsYellowAlert())
+                    {
+                        SetVignetteAlpha(0f);
+                       
+                        Debug.Log($"[VignetteBegone] 警报结束，恢复透明{Vignette.Instance.defaultColor.a}");
+                    }
+                }
+            }
+
+            [HarmonyPatch(typeof(Vignette), nameof(Vignette.Reset))]
+            public static class Vignette_Reset_Patch
+            {
+                public static bool Prefix(Vignette __instance)
+                {
+                    if (VignetteBegone.KModPatch.Add_Custom_Buttons1.vignetteHidden)
+                    {
+                        SetVignetteAlpha(0f);
+
+                        Traverse.Create(__instance).Field("showingRedAlert").SetValue(false);
+                        Traverse.Create(__instance).Field("showingYellowAlert").SetValue(false);
+
+                        var sounds = __instance.GetComponent<LoopingSounds>();
+                        sounds.StopSound(GlobalAssets.GetSound("RedAlert_LP"));
+                        sounds.StopSound(GlobalAssets.GetSound("YellowAlert_LP"));
+
+                        // Debug.Log("[VignetteBegone] 阻止 Reset，改为透明");
+                        return false; 
+                    }
+
+                    return true; 
+                }
             }
 
 
@@ -75,6 +126,8 @@ namespace VignetteBegone
                     tooltip.SetSimpleTooltip(tooltipText);
                     CustomButtonTooltips = tooltip;
                 }
+
+
             }
 
 
@@ -92,19 +145,25 @@ namespace VignetteBegone
                 if (!vignetteHidden)
                 {
                     // 首次点击：隐藏 Vignette（只改 alpha）
-                    Color hiddenColor = Vignette.Instance.defaultColor;
-                    hiddenColor.a = 0f;
-                    Vignette.Instance.SetColor(hiddenColor);
+                    SetVignetteAlpha(0f);
                     vignetteHidden = true;
                     UpdateCustomButtonState(1);
                 }
                 else
                 {
-                    // 再次点击：恢复默认颜色
-                    Vignette.Instance.Reset();
+                    // 恢复默认颜色
+                    // Vignette.Instance.Reset();
+                    Color c = Vignette.Instance.defaultColor;
+                    c.a = 0.4705882f;
+                    Vignette.Instance.SetColor(c);
                     vignetteHidden = false;
                     UpdateCustomButtonState(0);
                 }
+
+                // 保存按钮状态
+                PlayerPrefs.SetInt("VignetteHidden", vignetteHidden ? 1 : 0);
+                PlayerPrefs.Save();
+
             }
 
 
@@ -114,6 +173,26 @@ namespace VignetteBegone
             {
                 CustomButtons.ChangeState(a);
             }
+            private static void SetVignetteAlpha(float alpha)
+            {
+                if (Vignette.Instance == null) return;
+
+                Color c = Vignette.Instance.defaultColor;
+                c.a = alpha;
+                Vignette.Instance.SetColor(c);
+            }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
             // 缺氧默认黑色BG颜色  new Color(0.266f, 0.286f, 0.352f, 1f)
