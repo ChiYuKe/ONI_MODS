@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\..\..\Documents\Klei\OxygenNotIncluded\mods\Dev\MiniBox\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -32,23 +32,23 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
-      <HintPath>D:\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\0Harmony.dll</HintPath>
+      <HintPath>D:\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\0Harmony.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>D:\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>D:\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>D:\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>D:\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>D:\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\Newtonsoft.Json.dll</HintPath>
+      <HintPath>D:\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="PLib">
-      <HintPath>D:\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\PLib.dll</HintPath>
+      <HintPath>..\..\..\..\Documents\Klei\OxygenNotIncluded\mods\Dev\MinionAge\PLib.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -58,12 +58,12 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="UnityEngine">
-      <HintPath>D:\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\UnityEngine.dll</HintPath>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>D:\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>D:\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>D:\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -79,6 +79,11 @@
     <Compile Include="BuildingConfig\StorageLocker\StorageLockerPatch.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="KModPatch.cs" />
+    <Compile Include="MiscconfigConfig\DiggingPatch.cs" />
+    <Compile Include="MiscconfigConfig\MinionSleepPatch.cs" />
+    <Compile Include="MiscconfigConfig\MoppingPatch.cs" />
+    <Compile Include="MiscconfigConfig\StackPatch.cs" />
+    <Compile Include="MiscconfigConfig\SuperSpacesuitPatch.cs" />
     <Compile Include="PlantConfig\Plant\PlantPatch.cs" />
     <Compile Include="PowerConfig\Wiring\WiringPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

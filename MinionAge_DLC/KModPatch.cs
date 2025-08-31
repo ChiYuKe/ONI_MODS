@@ -71,9 +71,20 @@ namespace MinionAge_DLC
             }
         }
 
+        public static void RegisterForTranslation(Type locstring_tree_root)
+        {
+            Localization.RegisterForTranslation(locstring_tree_root);
+            Assembly executingAssembly = Assembly.GetExecutingAssembly();
+            // Localization.GenerateStringsTemplate(locstring_tree_root, Path.Combine(Manager.GetDirectory(), "strings_templates"));
+            Localization.GenerateStringsTemplate(locstring_tree_root, Path.Combine(Path.GetDirectoryName(executingAssembly.Location), "translations"));
+
+        }
+
+
         public static void Localize(Type root)
         {
-            ModUtil.RegisterForTranslation(root);
+            // ModUtil.RegisterForTranslation(root);
+            RegisterForTranslation(root);
             Assembly executingAssembly = Assembly.GetExecutingAssembly();
             string modName = executingAssembly.GetName().Name;
             string translationsPath = Path.Combine(Path.GetDirectoryName(executingAssembly.Location), "translations");

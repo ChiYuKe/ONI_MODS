@@ -10,6 +10,7 @@ using static MiniBox.Config;
 
 namespace MiniBox.TransportRouteConfig.TransportTrack
 {
+    // 运输轨道容量
     [HarmonyPatch(typeof(SolidConduitDispenser), "ConduitUpdate")]
     public class TransportTrackPatch
     {
@@ -22,7 +23,7 @@ namespace MiniBox.TransportRouteConfig.TransportTrack
                 if (flag)
                 {
                     list[i].operand = SingletonOptions<ConfigurationItem>.Instance.TransportTrackMaxCapacity;
-                    Debug.LogFormat("MiniBox::已调整轨道运输容量为{0}kg", new object[] { list[i].operand });
+                    
                 }
             }
             return list.AsEnumerable<CodeInstruction>();

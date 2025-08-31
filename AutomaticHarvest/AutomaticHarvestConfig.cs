@@ -69,18 +69,20 @@ namespace AutomaticHarvest
             //List<Tag> list = new List<Tag>();
             //list.AddRange(STORAGEFILTERS.STORAGE_LOCKERS_STANDARD);
             //list.AddRange(STORAGEFILTERS.FOOD);
-            Storage storage = go.AddOrGet<Storage>();
-            storage.capacityKg = 100000f;
-            storage.showInUI = true;
-            storage.showDescriptor = true;
-            storage.storageFilters = STORAGEFILTERS.STORAGE_LOCKERS_STANDARD;
-            storage.allowItemRemoval = false;
-            storage.onlyTransferFromLowerPriority = true;
-           
-            storage.showCapacityAsMainStatus = true;
 
-            go.AddOrGet<SolidConduitInbox>();
-            go.AddOrGet<SolidConduitDispenser>();
+
+            Storage storage = go.AddOrGet<Storage>();
+            //storage.capacityKg = 100000f;
+            //storage.showInUI = true;
+            //storage.showDescriptor = true;
+            //storage.storageFilters = STORAGEFILTERS.STORAGE_LOCKERS_STANDARD;
+            //storage.allowItemRemoval = false;
+            //storage.onlyTransferFromLowerPriority = true;
+           
+            //storage.showCapacityAsMainStatus = true;
+
+            //go.AddOrGet<SolidConduitInbox>();
+            //go.AddOrGet<SolidConduitDispenser>();
 
 
         }

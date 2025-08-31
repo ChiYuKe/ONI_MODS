@@ -22,6 +22,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VignetteBegone", "VignetteB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutomaticHarvest", "AutomaticHarvest\AutomaticHarvest.csproj", "{6C176A54-BC16-4D91-9689-1D7C146B1772}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{98F93518-7198-4932-BA16-AC88B4CFBA03}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestPlanter", "TestPlanter\TestPlanter.csproj", "{078C4FC3-DB20-4AF3-B7FB-CAFB8CBDE8C0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElementExpansion", "ElementExpansion\ElementExpansion.csproj", "{21509A00-E2EB-4DB5-B005-E30C977E12BC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,9 +62,22 @@ Global
 		{6C176A54-BC16-4D91-9689-1D7C146B1772}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C176A54-BC16-4D91-9689-1D7C146B1772}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C176A54-BC16-4D91-9689-1D7C146B1772}.Release|Any CPU.Build.0 = Release|Any CPU
+		{078C4FC3-DB20-4AF3-B7FB-CAFB8CBDE8C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{078C4FC3-DB20-4AF3-B7FB-CAFB8CBDE8C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{078C4FC3-DB20-4AF3-B7FB-CAFB8CBDE8C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{078C4FC3-DB20-4AF3-B7FB-CAFB8CBDE8C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21509A00-E2EB-4DB5-B005-E30C977E12BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21509A00-E2EB-4DB5-B005-E30C977E12BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21509A00-E2EB-4DB5-B005-E30C977E12BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21509A00-E2EB-4DB5-B005-E30C977E12BC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6C176A54-BC16-4D91-9689-1D7C146B1772} = {98F93518-7198-4932-BA16-AC88B4CFBA03}
+		{078C4FC3-DB20-4AF3-B7FB-CAFB8CBDE8C0} = {98F93518-7198-4932-BA16-AC88B4CFBA03}
+		{21509A00-E2EB-4DB5-B005-E30C977E12BC} = {98F93518-7198-4932-BA16-AC88B4CFBA03}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3BADC26A-6D6D-4365-8979-B3DFC7FCD96D}

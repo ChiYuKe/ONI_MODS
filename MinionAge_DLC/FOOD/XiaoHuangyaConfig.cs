@@ -158,13 +158,13 @@ namespace MinionAge_DLC
                 // 判断年龄是否足够减去 700f
                 if (currentAge > 900f)
                 {
-                    // 更新年龄
+                    // 更新复制人年龄
                     MinionDataSaver.UpdateMinionAge(worker.gameObject, currentAge - 700f);
                     Debug.Log($"更新年龄：当前年龄 = {currentAge} 秒，减去 700 秒后为 {currentAge - 700f} 秒");
                 }
 
 
-                // 移除掉“散热行者”
+                // 移除掉“散热者”和“积热者”
                 RemoveEffect(worker.gameObject, "HeatWanderer");
                 RemoveEffect(worker.gameObject, "CoolWanderer");
             }

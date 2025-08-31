@@ -56,28 +56,14 @@ namespace VignetteBegone
                 // Game.Instance.Subscribe((int)GameHashes.ExitedYellowAlert, OnAlertExited);
             }
 
-            private static void OnAlertExited(object data)
-            {
-                if (vignetteHidden && Vignette.Instance != null)
-                {
-                    var alertManager = ClusterManager.Instance.activeWorld.AlertManager;
-                    if (alertManager == null) return;
 
-                    if (!alertManager.IsRedAlert() && !alertManager.IsYellowAlert())
-                    {
-                        SetVignetteAlpha(0f);
-                       
-                        Debug.Log($"[VignetteBegone] 警报结束，恢复透明{Vignette.Instance.defaultColor.a}");
-                    }
-                }
-            }
 
             [HarmonyPatch(typeof(Vignette), nameof(Vignette.Reset))]
             public static class Vignette_Reset_Patch
             {
                 public static bool Prefix(Vignette __instance)
                 {
-                    if (VignetteBegone.KModPatch.Add_Custom_Buttons1.vignetteHidden)
+                    if (vignetteHidden)
                     {
                         SetVignetteAlpha(0f);
 
@@ -89,10 +75,10 @@ namespace VignetteBegone
                         sounds.StopSound(GlobalAssets.GetSound("YellowAlert_LP"));
 
                         // Debug.Log("[VignetteBegone] 阻止 Reset，改为透明");
-                        return false; 
+                        return false;
                     }
 
-                    return true; 
+                    return true;
                 }
             }
 
@@ -181,7 +167,21 @@ namespace VignetteBegone
                 c.a = alpha;
                 Vignette.Instance.SetColor(c);
             }
+            private static void OnAlertExited(object data)
+            {
+                if (vignetteHidden && Vignette.Instance != null)
+                {
+                    var alertManager = ClusterManager.Instance.activeWorld.AlertManager;
+                    if (alertManager == null) return;
 
+                    if (!alertManager.IsRedAlert() && !alertManager.IsYellowAlert())
+                    {
+                        SetVignetteAlpha(0f);
+
+                        Debug.Log($"[VignetteBegone] 警报结束，恢复透明{Vignette.Instance.defaultColor.a}");
+                    }
+                }
+            }
 
 
 

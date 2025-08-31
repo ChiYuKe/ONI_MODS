@@ -27,7 +27,11 @@ namespace TestElement
             }
         }
 
-
+        /// <summary>
+        /// 深拷贝一个 Texture2D，得到一份新的贴图对象，不依赖原来的内存
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
         public static Texture2D DuplicateTexture(Texture2D source)
         {
             RenderTexture temporary = RenderTexture.GetTemporary(source.width, source.height, 0, RenderTextureFormat.Default, RenderTextureReadWrite.Linear);
@@ -42,91 +46,102 @@ namespace TestElement
             return texture2D;
         }
 
-
-
-        // 加载本地图片为 Texture2D
-        public static Texture2D LoadTextureFromFile(string textureName)
+        public static class TextureLoader
         {
-            // 拼接图片路径
-            var path = Path.Combine(ElementUtil.ModPath, "assets", "textures", textureName + ".png");
+            /// <summary>
+            /// 根据名称加载 Mod 内部纹理（默认路径: assets/textures/{name}.png）
+            /// </summary>
+            public static Texture2D LoadTextureFromFile(string textureName)
+            {
+                var path = Path.Combine(ElementUtil.ModPath, "assets", "textures", textureName + ".png");
 
-            // 尝试加载图片
-            if (TryLoadTexture(path, out var texture))
-            {
-                Debug.Log($"成功加载纹理: {textureName}");
-                return texture;
-            }
-            else
-            {
-                Debug.LogError($"无法加载纹理: {textureName}");
+                if (TryLoadTexture(path, out var texture))
+                {
+                    LogUtil.Log($"成功加载纹理: {textureName}");
+                    return texture;
+                }
+
+                LogUtil.Error($"无法加载纹理: {textureName} ({path})");
                 return null;
+            }
+
+            /// <summary>
+            /// 尝试加载指定路径的纹理
+            /// </summary>
+            public static bool TryLoadTexture(string path, out Texture2D texture)
+            {
+                texture = LoadTexture(path);
+                return texture != null;
+            }
+
+            /// <summary>
+            /// 从路径加载纹理（失败时返回 null）
+            /// </summary>
+            public static Texture2D LoadTexture(string path)
+            {
+                if (!File.Exists(path))
+                {
+                    LogUtil.Warning($"纹理文件不存在: {path}");
+                    return null;
+                }
+
+                var bytes = TryReadFile(path);
+                if (bytes == null || bytes.Length == 0)
+                    return null;
+
+                try
+                {
+                    var tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+                    if (tex.LoadImage(bytes))
+                        return tex;
+
+                    LogUtil.Error($"纹理解码失败: {path}");
+                    return null;
+                }
+                catch (Exception ex)
+                {
+                    LogUtil.Error($"加载纹理出错: {path}, {ex}");
+                    return null;
+                }
+            }
+
+            /// <summary>
+            /// 安全读取文件字节
+            /// </summary>
+            private static byte[] TryReadFile(string path)
+            {
+                try
+                {
+                    return File.ReadAllBytes(path);
+                }
+                catch (Exception ex)
+                {
+                    LogUtil.Error($"无法读取文件: {path}, 错误: {ex}");
+                    return null;
+                }
             }
         }
 
 
 
 
+
+
+        [Obsolete("使用Test_Element.CreateTestElementMaterial,不过这个很灵活，但我现在只用改一个")]
         // 将 Texture2D 应用到材质
         public static void ApplyTextureToMaterial(Material material, string textureName, string propertyName = "_MainTex")
         {
-            var texture = LoadTextureFromFile(textureName);
+            var texture = TextureLoader.LoadTextureFromFile(textureName);
             if (texture != null)
             {
                 material.SetTexture(propertyName, texture);
-                Debug.Log($"已将纹理 {textureName} 应用到材质属性 {propertyName}");
+                // material.mainTexture = texture;
+                LogUtil.Log($"已将纹理 {textureName} 应用到材质属性 {propertyName}");
             }
         }
 
-
-
-
-
-
-
-
-
-
-        public static bool TryLoadTexture(string path, out Texture2D texture)
-        {
-            texture = LoadTexture(path, false);
-            return texture != null;
-        }
-
-        // Token: 0x06000667 RID: 1639 RVA: 0x0001C558 File Offset: 0x0001A758
-        public static Texture2D LoadTexture(string path, bool warnIfFailed = true)
-        {
-            Texture2D texture2D = null;
-            if (File.Exists(path))
-            {
-                byte[] array = TryReadFile(path);
-                texture2D = new Texture2D(1, 1);
-                texture2D.LoadImage(array);
-            }
-            else if (warnIfFailed)
-            {
-                Debug.LogWarning(new object[] { "无法在路径上加载纹理 " + path + "." });
-            }
-            return texture2D;
-        }
-        public static byte[] TryReadFile(string texFile)
-        {
-            byte[] array;
-            try
-            {
-                array = File.ReadAllBytes(texFile);
-            }
-            catch (Exception ex)
-            {
-                object[] array2 = new object[1];
-                int num = 0;
-                string text = "无法读取文件: ";
-                Exception ex2 = ex;
-                array2[num] = text + ((ex2 != null) ? ex2.ToString() : null);
-                Debug.Log(array2);
-                array = null;
-            }
-            return array;
-        }
+       
+       
 
 
 
@@ -159,7 +174,7 @@ namespace TestElement
             bool flag = kanimFile == null;
             if (flag)
             {
-                global::Debug.LogError("Failed to find KAnim: " + name);
+                global::LogUtil.Error("没找到动画文件: " + name);
             }
             return kanimFile;
         }

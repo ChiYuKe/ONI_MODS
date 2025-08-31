@@ -21,7 +21,7 @@ namespace MiniBox.MiscconfigConfig
                 bool flag = codeInstruction.opcode == OpCodes.Ldc_R4 && (double)((float)codeInstruction.operand) == 0.5;
                 if (flag)
                 {
-                    codeInstruction.operand = SingletonOptions<ConfigurationItem>.Instance.DiggingDropMultiplier;
+                    codeInstruction.operand = SingletonOptions<ConfigurationItem>.Instance.DiggingDropRate;
                 }
                 yield return codeInstruction;
             }

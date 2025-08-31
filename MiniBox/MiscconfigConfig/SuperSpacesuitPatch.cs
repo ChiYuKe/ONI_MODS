@@ -16,7 +16,7 @@ namespace MiniBox.MiscconfigConfig
       
         private static void Prefix(Db __instance)
         {
-            bool super_atmosuit = SingletonOptions<ConfigurationItem>.Instance.super_atmosuit;
+            bool super_atmosuit = SingletonOptions<ConfigurationItem>.Instance.SuperSpaceSuitPatch;
             EQUIPMENT.SUITS.ATMOSUIT_DIGGING = (super_atmosuit ? 200 : 10);
             EQUIPMENT.SUITS.ATMOSUIT_INSULATION = (super_atmosuit ? 3000 : 50);
             EQUIPMENT.SUITS.ATMOSUIT_SCALDING = (super_atmosuit ? 6000 : 1000);

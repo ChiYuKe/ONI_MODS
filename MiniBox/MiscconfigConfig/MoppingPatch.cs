@@ -16,7 +16,7 @@ namespace MiniBox.MiscconfigConfig
         
         public static void Postfix()
         {
-            MopTool.maxMopAmt = (SingletonOptions<ConfigurationItem>.Instance.MaximumMoppableMass ? 90000000f : 150f);
+            MopTool.maxMopAmt = (SingletonOptions<ConfigurationItem>.Instance.WateringPatch ? 900000000f : 150f);
         }
     }
 }
