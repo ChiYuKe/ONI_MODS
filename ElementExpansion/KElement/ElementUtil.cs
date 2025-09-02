@@ -112,9 +112,11 @@ namespace ElementExpansion
 
         #region Element Creation Helpers
 
-        public static Substance CreateSolidElement(string id, string anim, Color color, string texture = null, float brightness = 1f)
+        public static Substance CreateSolidElement(string id, string anim,Color color, Material material = null, string texture = null, float brightness = 1f)
         {
-            var material = Assets.instance.substanceTable.GetSubstance(SimHashes.Algae).material;
+            
+            material ??= Assets.instance.substanceTable.solidMaterial;
+
             return ElementUtil.CreateAndRegisterSubstance(
                 id, Element.State.Solid, anim, material, color, texture, brightness
             );
@@ -233,7 +235,7 @@ namespace ElementExpansion
             {
                 var substanceList = Assets.instance.substanceTable.GetList();
                 substanceList.Add(substance);
-                ElementLoader.FindElementByHash(substance.elementID).substance = substance;//这个非常非常非常关键
+                ElementLoader.FindElementByHash(substance.elementID).substance = substance;//这个非常非常非常关键，不然物质表里找不到这个物质
                 LogUtil.Log($"物质已添加到物质表: {elementId}");
             }
             catch (Exception ex)

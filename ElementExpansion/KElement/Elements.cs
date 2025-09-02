@@ -7,13 +7,14 @@ namespace ElementExpansion
     {
         public static void RegisterAllElements()
         {
-            var algaeMaterial = Assets.instance.substanceTable.GetSubstance(SimHashes.Algae).material;
+            var IronMaterial = Assets.instance.substanceTable.GetSubstance(SimHashes.Iron).material;
 
             // 固体元素
             TestElement = ElementUtil.CreateSolidElement(
                 "TestElement",
                 "Test_element_kanim",
                 new Color32(255, 255, 255, 255),
+                null,
                 "TestElementTexture",
                 1f
             );
