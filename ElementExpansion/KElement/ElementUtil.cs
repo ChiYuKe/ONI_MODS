@@ -112,9 +112,9 @@ namespace ElementExpansion
 
         #region Element Creation Helpers
 
-        public static Substance CreateSolidElement(string id, string anim, Color color, string texture = null, float brightness = 1f)
+        public static Substance CreateSolidElement(string id, string anim, Color color,Material material = null,string texture = null, float brightness = 1f)
         {
-            var material = Assets.instance.substanceTable.GetSubstance(SimHashes.Algae).material;
+            material ??= Assets.instance.substanceTable.solidMaterial;
             return ElementUtil.CreateAndRegisterSubstance(
                 id, Element.State.Solid, anim, material, color, texture, brightness
             );
@@ -130,7 +130,7 @@ namespace ElementExpansion
 
         public static Substance CreateGasElement(string id, Color color)
         {
-            var material = Assets.instance.substanceTable.liquidMaterial; // 气体通常使用液体材质
+            var material = Assets.instance.substanceTable.liquidMaterial; // 没看到默认气体材，用的液体材质
             return ElementUtil.CreateAndRegisterSubstance(
                 id, Element.State.Gas, "gas_tank_kanim", material, color
             );
