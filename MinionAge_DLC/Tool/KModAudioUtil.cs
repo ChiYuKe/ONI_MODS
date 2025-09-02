@@ -8,7 +8,6 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using TestElement;
 using UnityEngine;
 
 namespace KModTool
@@ -28,7 +27,7 @@ namespace KModTool
         {
             get
             {
-                return Path.Combine(ElementUtil.ModPath, "assets");
+                return Path.Combine(ModPath, "assets");
             }
         }
 
