@@ -121,13 +121,7 @@
     <Compile Include="Component\ExplosionUtil.cs" />
     <Compile Include="Component\MinionRangeScanner.cs" />
     <Compile Include="Component\FlyingEffectForMinion.cs" />
-    <Compile Include="Element\Assets_SubstanceListHookup.cs" />
-    <Compile Include="Element\ElementUtil.cs" />
-    <Compile Include="Element\Audio.cs" />
-    <Compile Include="Element\NewSimHashes.cs" />
-    <Compile Include="Element\SimHashUtil.cs" />
-    <Compile Include="Element\TestElementConfig.cs" />
-    <Compile Include="Element\Test_Element.cs" />
+    <Compile Include="Audio.cs" />
     <Compile Include="TestButton.cs" />
     <Compile Include="FOOD\ECM_FoodPatch.cs" />
     <Compile Include="FOOD\XiaoHuangyaConfig.cs" />
