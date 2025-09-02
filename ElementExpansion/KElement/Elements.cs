@@ -14,7 +14,7 @@ namespace ElementExpansion
                 "TestElement",
                 "Test_element_kanim",
                 new Color32(255, 255, 255, 255),
-                null
+                null,
                 "TestElementTexture",
                 1f
             );
