@@ -10,9 +10,9 @@ namespace CykUtils
     public static class KModMinionUtils
     {
         /// <summary>
-        /// 获取所有场景中活跃的复制人对象。
+        /// 获取所有场景中活跃的复制人对象（排除带有 Bionic 标签的）。
         /// </summary>
-        /// <returns>包含所有复制人对象的列表。</returns>
+        /// <returns>包含所有符合条件复制人对象的列表。</returns>
         public static List<GameObject> GetAllMinionGameObjects()
         {
             List<GameObject> minionGameObjects = new List<GameObject>();
@@ -22,9 +22,16 @@ namespace CykUtils
             {
                 if (minionIdentity != null)
                 {
-                    GameObject minionObject = minionIdentity.gameObject; // 直接获取 GameObject
+                    GameObject minionObject = minionIdentity.gameObject;
                     if (minionObject != null)
                     {
+                        // 检查是否包含 Bionic 标签
+                        KPrefabID prefabID = minionObject.GetComponent<KPrefabID>();
+                        if (prefabID != null && prefabID.HasTag(GameTags.Minions.Models.Bionic))
+                        {
+                            continue; // 跳过仿生复制人
+                        }
+
                         minionGameObjects.Add(minionObject); // 添加到列表中
                     }
                 }
@@ -32,6 +39,7 @@ namespace CykUtils
 
             return minionGameObjects; // 返回完整的列表
         }
+
 
         // 封装信息打印的静态方法
         public static void PrintMinionIdentityInfo(GameObject obj)
