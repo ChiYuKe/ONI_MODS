@@ -7,6 +7,13 @@ using HarmonyLib;
 using System.Reflection;
 using EternalDecay.Content.Comps;
 using static UnityEngine.GraphicsBuffer;
+using static STRINGS.UI.UISIDESCREENS.AUTOPLUMBERSIDESCREEN.BUTTONS;
+using CykUtils;
+using EternalDecay.Content.Comps.DebuffCom;
+using System.IO;
+using STRINGS;
+using EternalDecay.Content.Comps.KUI;
+
 
 public class Accepttheinheritance : Workable
 {
@@ -35,7 +42,7 @@ public class Accepttheinheritance : Workable
     protected override void OnSpawn()
     {
         base.OnSpawn();
-        this.SetWorkTime(10);
+        this.SetWorkTime(8);
     }
 
 
@@ -133,8 +140,112 @@ public class Accepttheinheritance : Workable
             1.5f,                                        // 显示时长
             false                                        // 是否跟随物体移动
           );
-        targetGameObject.AddOrGet<KPrefabID>().AddTag("Assigned", true);
+        targetGameObject.AddOrGet<KPrefabID>().AddTag("Assigned", true);// 有这个tag的不会显示在那个罐中脑列表里面
     }
+
+
+
+    protected override void OnAbortWork(WorkerBase worker)
+    {
+        base.OnAbortWork(worker);
+        LogUtil.Log("工作中止");
+    }
+    protected override void OnStartWork(WorkerBase worker)
+    {
+        base.OnStartWork(worker);
+        LogUtil.Log("开始工作");
+       
+    }
+
+    protected override void OnCompleteWork(WorkerBase worker)
+    {
+        base.OnCompleteWork(worker);
+        GameObject minion = worker.gameObject;
+
+        if (minion != null && minion.GetComponent<ColorfulPulsatingLight2D>() == null)
+        {
+            var light = minion.AddComponent<ColorfulPulsatingLight2D>();
+            light.PulseSpeed = 1.5f;
+            light.MinIntensity = 800f;
+            light.MaxIntensity = 2000f;
+            light.MinRadius = 4f;
+            light.MaxRadius = 8f;
+            light.Colors = new Color[] { Color.red, Color.yellow, Color.green };
+            LogUtil.Log($"{minion.name} 已添加 ColorfulPulsatingLight2D 组件");
+
+           
+
+
+        }
+        minion.AddOrGet<AbyssophobiaDebuff>();
+
+
+        // --- 弹出窗口 ---
+        GameObject canvas = GameObject.Find("ScreenSpaceOverlayCanvas");
+
+        var dialog = Util.KInstantiateUI<InfoDialogScreen>(
+            ScreenPrefabs.Instance.InfoDialogScreen.gameObject, // 复用游戏自带的 InfoDialogScreen prefab
+            canvas, // 父节点（canvas）
+            true
+        );
+
+        // 组装 UI
+        dialog
+            .SetHeader("任务提示")
+            .AddPlainText("你发现了一件古代遗物。是否要带回研究所？")
+            .AddSpacer(10f)
+            .AddLineItem("遗物: 古代雕像", "可能包含某些特殊属性")
+            .AddOption("带回去", d => Debug.Log("选择了带回去"))
+            .AddOption("放弃", d => Debug.Log("选择了放弃"), rightSide: true)
+            .AddDefaultCancel();
+
+
+
+
+        // var canvas = GameScreenManager.Instance.ssOverlayCanvas;
+
+
+        // 创建屏幕对象
+        var screenGO = new GameObject("MySimpleDialog");
+        var dialog1 = screenGO.AddComponent<SimpleDialogScreen>();
+
+        // 将屏幕对象放到 Canvas 下
+        screenGO.transform.SetParent(canvas.transform, false);
+
+        // 激活显示
+        dialog1.Activate();
+
+
+
+
+
+
+        //// 实例化 ConfirmDialogScreen
+        //var confirmDialog = Util.KInstantiateUI<ConfirmDialogScreen>(
+        //    ScreenPrefabs.Instance.ConfirmDialogScreen.gameObject,
+        //    canvas,
+        //    true
+        //);
+
+        //// 设置内容并显示
+        //confirmDialog.PopupConfirmDialog(
+        //    "确定要执行这个操作吗？",
+        //    on_confirm: () => Debug.Log("确认！"),
+        //    on_cancel: () => Debug.Log("取消！"),
+        //    title_text: "提示",
+        //    confirm_text: "确定",
+        //    cancel_text: "返回"
+        //);
+
+
+
+
+
+
+
+    }
+
+
 
 
 

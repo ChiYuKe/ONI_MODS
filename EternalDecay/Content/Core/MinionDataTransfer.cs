@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using EternalDecay.Content.Configs;
+using Klei.AI;
 using TUNING;
 using UnityEngine;
 
@@ -44,8 +46,27 @@ namespace EternalDecay.Content.Core
         // 转移特质
         public static void TransferTraits(GameObject oldMinion, GameObject newMinion)
         {
+            var oldTraits = oldMinion?.GetComponent<Traits>();
+            var newTraits = newMinion?.GetComponent<Traits>();
 
+            if (oldTraits == null || newTraits == null) return;
+
+            int traitsAdded = 0;
+            var maxTraits = TUNINGS.TIMERMANAGER.RANDOMDEBUFFTIMERMANAGER.TRANSFER.TRAITSMAXAMOUNT;
+
+            foreach (var trait in oldTraits.TraitList.Where(t => t.Id != "MinionBaseTrait" && !newTraits.HasTrait(t)))
+            {
+                if (traitsAdded >= maxTraits)
+                {
+                    Debug.LogWarning($"{newMinion.name} 已经继承了 {maxTraits} 条特质，无法继承更多特质。");
+                    break;
+                }
+
+                newTraits.Add(trait);
+                traitsAdded++;
+            }
         }
+
 
         // 转移技能
         public static void TransferSkills(GameObject oldMinion, GameObject newMinion)

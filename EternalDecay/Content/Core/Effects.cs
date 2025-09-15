@@ -17,6 +17,7 @@ namespace EternalDecay.Content.Core
             if (modifierSet == null) return;
             AgingFatigue(modifierSet);
             Baozhiqi(modifierSet);
+            Dihuang(modifierSet);
 
         }
 
@@ -27,9 +28,9 @@ namespace EternalDecay.Content.Core
             Effects effectsComponent = gameObject.GetComponent<Effects>();
 
             effectsComponent.GetTimeLimitedEffects();
-            if (effectsComponent != null && !effectsComponent.HasEffect(BuffName)) 
+            if (effectsComponent != null && !effectsComponent.HasEffect(BuffName))
             {
-                effectsComponent.Add(BuffName, true); 
+                effectsComponent.Add(BuffName, true);
 
             }
         }
@@ -55,6 +56,7 @@ namespace EternalDecay.Content.Core
 
         public static readonly string ETERNALDECAY_SHUAILAO = GetEffectID("shuailao");
         public static readonly string ETERNALDECAY_BAOZHIQI = GetEffectID("baozhiqi");
+        public static readonly string ETERNALDECAY_LUMINESCENCEKING = GetEffectID("LuminescenceKing");
 
 
         /// <summary>
@@ -78,5 +80,14 @@ namespace EternalDecay.Content.Core
                 .SetEffectDescription(Configs.STRINGS.DUPLICANTS.MODIFIERS.ETERNALDECAY_BAOZHIQI.TOOLTIP)
                 .ApplyTo(modifierSet);
         }
+
+        private static void Dihuang(ModifierSet modifierSet) 
+        {
+            new EffectBuilderUtil(ETERNALDECAY_LUMINESCENCEKING, 600f, false)
+              .SetEffectName(Configs.STRINGS.DUPLICANTS.MODIFIERS.LUMINESCENCEKING.NAME)
+              .SetEffectDescription(Configs.STRINGS.DUPLICANTS.MODIFIERS.LUMINESCENCEKING.TOOLTIP)
+              .AddAttributeModifier(Attributes.Luminescence.Id, 5000f, false, false, true)
+              .ApplyTo(modifierSet);
+        } 
     }
 }

@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Klei.AI;
 using CykUtils;
-using MinionAge.Core;
 
-namespace EternalDecay.Content.Core.Utils
+namespace EternalDecay.Content.Core
 {
     public static class MinionEventManager
     {

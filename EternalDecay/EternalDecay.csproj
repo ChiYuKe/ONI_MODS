@@ -36,10 +36,16 @@
   <ItemGroup>
     <Compile Include="Content\Comps\Accepttheinheritance.cs" />
     <Compile Include="Content\Comps\ColorfulPulsatingLight2D.cs" />
+    <Compile Include="Content\Comps\DebuffCom\AbyssophobiaDebuff.cs" />
+    <Compile Include="Content\Utils\UI\Button.cs" />
+    <Compile Include="Content\Comps\KUI\CustomInfoDialogScreen.cs" />
     <Compile Include="Content\Comps\MiniBrain.cs" />
+    <Compile Include="Content\Comps\MinionBrainResume.cs" />
     <Compile Include="Content\Comps\Ownable.cs" />
+    <Compile Include="Content\Configs\GameTags.cs" />
     <Compile Include="Content\Configs\ModConfig.cs" />
     <Compile Include="Content\Configs\STRINGS.cs" />
+    <Compile Include="Content\Configs\TUNINGS.cs" />
     <Compile Include="Content\Core\Effects.cs" />
     <Compile Include="Content\Core\EternalDecayInitializer.cs" />
     <Compile Include="Content\Core\EternalDecayMain.cs" />
@@ -50,12 +56,14 @@
     <Compile Include="Content\Items\MiniBrainConfig.cs" />
     <Compile Include="Content\Patches\AssignableSlotsPatch.cs" />
     <Compile Include="Content\Patches\ChoreTypesPatch.cs" />
+    <Compile Include="Content\Patches\HoverInfoDrawerPatch.cs" />
     <Compile Include="Content\Patches\DeathsPatch.cs" />
+    <Compile Include="Content\Patches\DetailTabHeaderPatch.cs" />
+    <Compile Include="Content\Patches\EffectConfigsFXPatch.cs" />
     <Compile Include="Content\Patches\MinionPatch.cs" />
     <Compile Include="Content\Patches\VitalsTableScreenPatch.cs" />
-    <Compile Include="Content\Utils\ButtonUtil.cs" />
     <Compile Include="Content\Utils\EffectBuilderUtil.cs" />
-    <Compile Include="Content\Utils\ScreenUtil.cs" />
+    <Compile Include="Content\Utils\UI\KUIBuilder.cs" />
     <Compile Include="KModPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Content\Utils\KLocUtil.cs" />
@@ -80,8 +88,19 @@
       <HintPath>D:\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>D:\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\Unity.TextMeshPro.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>D:\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule">
+      <HintPath>D:\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>D:\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">

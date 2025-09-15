@@ -1,5 +1,8 @@
 ﻿
+using System.Collections.Generic;
+using System.Linq;
 using CykUtils;
+using EternalDecay.Content.Comps;
 using EternalDecay.Content.Core;
 using HarmonyLib;
 using KMod;
@@ -35,6 +38,7 @@ namespace EternalDecay
 
             // 在 ModifierSet 初始化时注册所有自定义效果。//
             [HarmonyPatch(typeof(ModifierSet), "Initialize")]
+            [HarmonyPriority(Priority.First)]
             public static class ModifierSet_Initialize_Patch
             {
                 public static void Postfix(ModifierSet __instance)
@@ -47,17 +51,23 @@ namespace EternalDecay
 
 
 
+            //[HarmonyPatch(typeof(Db), "Initialize")]
+            //public class WaterCoolerPatch
+            //{
+            //    public static void Postfix(Db __instance)
+            //    {
+            //        // 新增饮料选项
+            //        var newBeverages = new List<Tuple<Tag, string>>(WaterCoolerConfig.BEVERAGE_CHOICE_OPTIONS)
+            //        {
+            //            new Tuple<Tag, string>(
+            //                SimHashes.Algae.CreateTag(),
+            //                KEffects.ETERNALDECAY_LUMINESCENCEKING 
+            //            )
+            //        };
 
-
-
-
-
-
-
-
-
-
-
+            //        WaterCoolerConfig.BEVERAGE_CHOICE_OPTIONS = newBeverages.ToArray();
+            //    }
+            //}
 
         }
     }

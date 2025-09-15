@@ -39,6 +39,8 @@ public class ColorfulPulsatingLight2D : KMonoBehaviour
         baseLight.Color = Colors[currentColorIndex];
         baseLight.Lux = (int)MinIntensity;
         baseLight.Range = MinRadius; 
+        baseLight.shape = LightShape.Circle;
+        baseLight.drawOverlay = true;
     }
 
     protected override void OnSpawn()
@@ -78,4 +80,6 @@ public class ColorfulPulsatingLight2D : KMonoBehaviour
 
         baseLight.FullRefresh();
     }
+
+   
 }

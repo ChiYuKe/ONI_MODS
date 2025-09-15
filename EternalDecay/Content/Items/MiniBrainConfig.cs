@@ -40,19 +40,15 @@ namespace EternalDecay.Content.Items
             gameObject.AddTag(GameTags.Dead);
             gameObject.AddOrGet<KSelectable>();
             
+
             gameObject.AddOrGet<KMinionBrain>();
-
+            gameObject.AddOrGet<MinionBrainResume>();
             gameObject.AddOrGet<Accepttheinheritance>();
-
-
-
-
 
             gameObject.AddOrGet<Modifiers>();
             gameObject.AddOrGet<Traits>();
             gameObject.AddOrGet<UserNameable>();
             gameObject.AddOrGet<Effects>();
-            // gameObject.AddOrGet<MinionBrainResume>();
             gameObject.AddOrGet<AttributeLevels>();
             gameObject.AddOrGet<AttributeConverters>();
             gameObject.AddOrGet<KOwnable>();

@@ -8,6 +8,7 @@ using HarmonyLib;
 using static STRINGS.DUPLICANTS.MODIFIERS;
 using UnityEngine;
 using Database;
+using EternalDecay.Content.Configs;
 
 namespace EternalDecay.Content.Patches
 {
@@ -58,7 +59,7 @@ namespace EternalDecay.Content.Patches
                     LogUtil.LogError("OnDeath: data 不是一个 GameObject 对象。");
                     return true;
                 }
-                if (deathObject.HasTag("NoMourning"))
+                if (deathObject.HasTag(KGameTags.NoMourning))
                 {
 
                     return false; 

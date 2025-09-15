@@ -14,37 +14,34 @@ namespace EternalDecay.Content.Patches
 
 
 
-
-
-        [HarmonyPatch(typeof(EffectConfigs), "CreatePrefabs")]
-        public static class EffectConfigs_CreatePrefabs_Patch
+        [HarmonyPatch(typeof(HeadquartersConfig), "ConfigureBuildingTemplate")]
+        public static class HeadquartersConfigPatch
         {
-            public static void Postfix(ref List<GameObject> __result)
+            public static void Postfix(GameObject go, Tag prefab_tag)
             {
-                GameObject newEffect = EntityTemplates.CreateEntity(
-                    "KMinionBrainBadFx",  // ID
-                    "KMinionBrainBadFx",  // name
-                    false              // 是否可选中
-                );
-
-                KBatchedAnimController anim = newEffect.AddOrGet<KBatchedAnimController>();
-                anim.materialType = KAnimBatchGroup.MaterialType.Simple;
-                anim.animScale = 0.005f;
-                anim.initialAnim = "loop";  // 动画初始状态
-                anim.initialMode = KAnim.PlayMode.Once;
-                anim.destroyOnAnimComplete = true;
-
-
-                anim.AnimFiles = new KAnimFile[]
+                Light2D light2D = go.GetComponent<Light2D>();
+                if (light2D != null)
                 {
-            Assets.GetAnim("Mywhirlpool_fx_kanim")
-                };
-
-                //添加声音
-                //newEffect.AddOrGet<LoopingSounds>();
-                __result.Add(newEffect);
+                    light2D.drawOverlay = false;
+                }
             }
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -176,8 +173,8 @@ namespace EternalDecay.Content.Patches
                 if (!__result.Any(m => m.AttributeId == AmountsPatch.AgeAttribute.Id))
                 {
                     newModifiers.Add(new AttributeModifier(
-                        AmountsPatch.AgeAttribute.maxAttribute.Id,  
-                        3f,                          
+                        AmountsPatch.AgeAttribute.maxAttribute.Id,
+                        Configs.TUNINGS.AGE.MINION_AGE_THRESHOLD,                          
                         Configs.STRINGS.MISC.NOTIFICATIONS.AGEATTRIBUTE.NAME, 
                         false,                         
                         false,                          

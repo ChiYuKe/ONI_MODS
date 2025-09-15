@@ -1,52 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using HarmonyLib;
-using MinionAge.Core;
 using UnityEngine;
+using HarmonyLib;
+using EternalDecay.Content.Core;
+
 
 namespace EternalDecay.Content.Patches
 {
     internal class VitalsTableScreenPatch
     {
-        public static float MaxMinionAge = 3;
+        public static float MaxMinionAge = Configs.TUNINGS.AGE.MINION_AGE_THRESHOLD;
+        public static float Age80PercentThreshold = MaxMinionAge * Configs.TUNINGS.AGE.AGE_80PERCENT_THRESHOLD;
 
         [HarmonyPatch(typeof(VitalsTableScreen), "OnActivate")]
-        public static class VitalsTableScreen_OnActivate_Patch
+        public static class OnActivatePatch
         {
-            private static MethodInfo _getWidgetRowMethod;
-            private static MethodInfo _getWidgetColumnMethod;
+            private static MethodInfo _getWidgetRow;
+            private static MethodInfo _getWidgetColumn;
+            private static bool _initialized = false;
 
-            // 秒数转换为周期（600秒=1周期）
+            private static void EnsureReflectionInitialized(VitalsTableScreen instance)
+            {
+                if (_initialized) return;
+
+                _getWidgetRow = typeof(TableScreen).GetMethod("GetWidgetRow",
+                    BindingFlags.Instance | BindingFlags.NonPublic)
+                    ?? throw new MissingMethodException("未找到 GetWidgetRow 方法");
+
+                _getWidgetColumn = typeof(TableScreen).GetMethod("GetWidgetColumn",
+                    BindingFlags.Instance | BindingFlags.NonPublic)
+                    ?? throw new MissingMethodException("未找到 GetWidgetColumn 方法");
+
+                _initialized = true;
+            }
+
             private static float SecondsToCycles(float seconds) => seconds / 600f;
 
-            private static float SecondsToDisplayCycles(float seconds)
-            {
-                return (seconds / 600f) + 0.4f; // 手搓偏移
-            }
+            private static string FormatAge(float seconds) => $"{SecondsToCycles(seconds):F1}/{MaxMinionAge:F0}";
 
             public static void Postfix(VitalsTableScreen __instance)
             {
                 try
                 {
-                    // 缓存反射方法
-                    _getWidgetRowMethod = typeof(TableScreen).GetMethod("GetWidgetRow",
-                        BindingFlags.Instance | BindingFlags.NonPublic)
-                        ?? throw new MissingMethodException("GetWidgetRow方法未找到");
+                    EnsureReflectionInitialized(__instance);
 
-                    _getWidgetColumnMethod = typeof(TableScreen).GetMethod("GetWidgetColumn",
-                        BindingFlags.Instance | BindingFlags.NonPublic)
-                        ?? throw new MissingMethodException("GetWidgetColumn方法未找到");
-
-                    // 获取AddLabelColumn方法
-                    var addLabelColumnMethod = typeof(TableScreen).GetMethod(
+                    var addLabelColumn = typeof(TableScreen).GetMethod(
                         "AddLabelColumn",
                         BindingFlags.Instance | BindingFlags.NonPublic,
                         null,
-                        new Type[] {
+                        new Type[]
+                        {
                             typeof(string),
                             typeof(Action<IAssignableIdentity, GameObject>),
                             typeof(Func<IAssignableIdentity, GameObject, string>),
@@ -56,111 +60,106 @@ namespace EternalDecay.Content.Patches
                             typeof(int),
                             typeof(bool)
                         },
-                        null) ?? throw new MissingMethodException("AddLabelColumn方法未找到");
+                        null) ?? throw new MissingMethodException("未找到 AddLabelColumn 方法");
 
-                    Action<IAssignableIdentity, GameObject> onLoadAge = (identity, widget_go) =>
-                        OnLoadAge(__instance, identity, widget_go);
-
-                    // 添加年龄列
-                    addLabelColumnMethod.Invoke(__instance, new object[] {
+                    addLabelColumn.Invoke(__instance, new object[]
+                    {
                         "年龄",
-                        onLoadAge,
-                        new Func<IAssignableIdentity, GameObject, string>(GetValueAgeLabel),
-                        new Comparison<IAssignableIdentity>(CompareRowsAge),
-                        new Action<IAssignableIdentity, GameObject, ToolTip>(OnTooltipAge),
-                        new Action<IAssignableIdentity, GameObject, ToolTip>(OnTooltipSortAge),
-                        70,  // 列宽度
-                        true // 可排序
+                        new Action<IAssignableIdentity, GameObject>((identity, go) => LoadAge(__instance, identity, go)),
+                        new Func<IAssignableIdentity, GameObject, string>(GetAgeLabel),
+                        new Comparison<IAssignableIdentity>(CompareByAge),
+                        new Action<IAssignableIdentity, GameObject, ToolTip>(ShowTooltipAge),
+                        new Action<IAssignableIdentity, GameObject, ToolTip>(ShowTooltipSortAge),
+                        70,
+                        true
                     });
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    Debug.LogError($"初始化年龄列失败: {e}");
+                    Debug.LogError($"初始化年龄列失败: {ex}");
                 }
             }
 
-            private static void OnLoadAge(VitalsTableScreen instance, IAssignableIdentity identity, GameObject widget_go)
+            private static void LoadAge(VitalsTableScreen screen, IAssignableIdentity identity, GameObject widget)
             {
                 try
                 {
-                    var widgetRow = _getWidgetRowMethod.Invoke(instance, new object[] { widget_go }) as TableRow;
-                    var label = widget_go.GetComponentInChildren<LocText>(true);
+                    var row = _getWidgetRow.Invoke(screen, new object[] { widget }) as TableRow;
+                    var label = widget.GetComponentInChildren<LocText>(true);
 
                     if (identity is MinionIdentity minion)
                     {
-                        var column = _getWidgetColumnMethod.Invoke(instance, new object[] { widget_go }) as LabelTableColumn;
-                        label.text = column?.get_value_action?.Invoke(minion, widget_go) ?? "年龄";
+                        var column = _getWidgetColumn.Invoke(screen, new object[] { widget }) as LabelTableColumn;
+                        label.text = column?.get_value_action?.Invoke(minion, widget) ?? "年龄";
                     }
                     else
                     {
-                        label.text = widgetRow?.isDefault == true ? "" : "年龄";
+                        label.text = row?.isDefault == true ? "" : "年龄";
                     }
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    Debug.LogError($"加载年龄显示失败: {e}");
+                    Debug.LogError($"加载年龄失败: {ex}");
                 }
             }
 
-
-            private static string GetValueAgeLabel(IAssignableIdentity identity, GameObject widget_go)
+            private static string GetAgeLabel(IAssignableIdentity identity, GameObject widget)
             {
                 if (identity is MinionIdentity minion)
                 {
-                    float currentAgeSeconds = MinionDataSaver.GetCurrentAgeInSeconds(minion.gameObject);
-                    if (currentAgeSeconds >= 0)
-                    {
-                        float currentAgeCycles = SecondsToCycles(currentAgeSeconds);
-                        return $"{currentAgeCycles:F1}/{MaxMinionAge:F0}";
-                    }
-                    return "不支持";
+                    // 如果是仿生复制人，直接返回 "不适用"
+                    var prefabID = minion.GetComponent<KPrefabID>();
+                    if (prefabID.HasTag(GameTags.Minions.Models.Bionic))
+                        return "不适用";
+
+                    float ageSeconds = MinionDataSaver.GetCurrentAgeInSeconds(minion.gameObject);
+                    return ageSeconds >= 0 ? FormatAge(ageSeconds) : "不适用";
                 }
                 return "--";
             }
 
-            private static int CompareRowsAge(IAssignableIdentity a, IAssignableIdentity b)
+            private static int CompareByAge(IAssignableIdentity a, IAssignableIdentity b)
             {
-                float ageA = GetAgeValue(a);
-                float ageB = GetAgeValue(b);
-                return ageA.CompareTo(ageB);
+                return GetAgeValue(a).CompareTo(GetAgeValue(b));
             }
 
             private static float GetAgeValue(IAssignableIdentity identity)
             {
                 if (identity is MinionIdentity minion)
                 {
-                    float currentAgeSeconds = MinionDataSaver.GetCurrentAgeInSeconds(minion.gameObject);
-                    if (currentAgeSeconds >= 0)
-                    {
-                        return SecondsToCycles(currentAgeSeconds);
-                    }
+                    float ageSeconds = MinionDataSaver.GetCurrentAgeInSeconds(minion.gameObject);
+                    if (ageSeconds >= 0) return SecondsToCycles(ageSeconds);
                 }
                 return -1f;
             }
 
-            private static void OnTooltipAge(IAssignableIdentity identity, GameObject widget_go, ToolTip tooltip)
+            private static void ShowTooltipAge(IAssignableIdentity identity, GameObject widget, ToolTip tooltip)
             {
                 if (identity is MinionIdentity minion)
                 {
-                    float currentAgeSeconds = MinionDataSaver.GetCurrentAgeInSeconds(minion.gameObject);
-                    if (currentAgeSeconds >= 0)
+                    var prefabID = minion.GetComponent<KPrefabID>();
+                    // 如果是仿生复制人，不显示 Tooltip
+                    if (prefabID.HasTag(GameTags.Minions.Models.Bionic))
+                        return;
+
+                    float ageSeconds = MinionDataSaver.GetCurrentAgeInSeconds(minion.gameObject);
+                    if (ageSeconds >= 0)
                     {
-                        float currentAgeCycles = SecondsToCycles(currentAgeSeconds);
                         tooltip.SetSimpleTooltip(
-                            $"当前年龄: {currentAgeCycles:F1} 周期\n" +
+                            $"当前年龄: {SecondsToCycles(ageSeconds):F1} 周期\n" +
                             $"最大年龄: {MaxMinionAge:F0} 周期\n" +
-                            $"(相当于 {currentAgeSeconds} 秒)");
+                            $"衰老年龄{Age80PercentThreshold}"
+                        );
                         return;
                     }
                 }
                 tooltip.SetSimpleTooltip("年龄数据不可用");
             }
 
-            private static void OnTooltipSortAge(IAssignableIdentity identity, GameObject widget_go, ToolTip tooltip)
+            private static void ShowTooltipSortAge(IAssignableIdentity identity, GameObject widget, ToolTip tooltip)
             {
                 tooltip.SetSimpleTooltip("按当前年龄排序（周期单位）");
             }
         }
     }
-
 }

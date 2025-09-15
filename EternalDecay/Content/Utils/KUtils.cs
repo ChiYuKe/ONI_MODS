@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace CykUtils
 {
-    internal class KUtils
+    public class KUtils
     {
         public static string ModPath
         {

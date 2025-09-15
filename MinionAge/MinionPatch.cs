@@ -15,7 +15,7 @@ namespace MinionAge
     [HarmonyPatch(typeof(BaseMinionConfig))]
     public static class AddMinionAmountsPatch
     {
-        // 补丁 2：AddMinionAmounts 方法
+        
         [HarmonyPostfix]
         [HarmonyPatch("AddMinionAmounts")]
         public static void Postfix(Modifiers modifiers)

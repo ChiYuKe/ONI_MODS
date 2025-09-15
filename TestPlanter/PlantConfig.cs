@@ -76,11 +76,11 @@ namespace TestPlanter
             gameObject.AddOrGet<BlightVulnerable>(); // 植物易受枯萎影响 ,如果没做枯萎动画那就移除掉吧
 
 
-            //KBatchedAnimController animController = gameObject.GetComponent<KBatchedAnimController>();
-            //if (animController != null)
-            //{
-            //    animController.animScale = 0.0007f; 
-            //}
+            KBatchedAnimController animController = gameObject.GetComponent<KBatchedAnimController>();
+            if (animController != null)
+            {
+                animController.animScale = 0.0007f;
+            }
 
 
 

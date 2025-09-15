@@ -1,12 +1,8 @@
-﻿using System;
+﻿
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CykUtils;
 using STRINGS;
 using UnityEngine;
-using static EternalDecay.Content.Patches.ChoreTypesPatch;
+
 
 namespace EternalDecay.Content.Comps
 {
@@ -91,14 +87,14 @@ namespace EternalDecay.Content.Comps
                 if (component != null && component.HasBatchInstanceData)
                 {
                     
-                    component.TintColour = ((this.assignee == null) ? ownedTint : new Color(0.5f, 0.5f, 0f));
+                    component.TintColour = ((this.assignee == null) ? ownedTint : ownedTint);
                     return;
                 }
                 // 物品动画颜色
                 KBatchedAnimController component2 = base.GetComponent<KBatchedAnimController>();
                 if (component2 != null && component2.HasBatchInstanceData)
                 {
-                    component2.TintColour = ((this.assignee == null) ? ownedTint : new Color(0.5f, 0.5f, 0f));
+                    component2.TintColour = ((this.assignee == null) ? ownedTint : ownedTint);
                 }
             }
         }

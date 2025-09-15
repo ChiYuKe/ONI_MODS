@@ -4,7 +4,7 @@ using System.IO;
 using Newtonsoft.Json;
 using UnityEngine;
 
-namespace MinionAge.Core
+namespace EternalDecay.Content.Core
 {
     public static class MinionDataSaver
     {

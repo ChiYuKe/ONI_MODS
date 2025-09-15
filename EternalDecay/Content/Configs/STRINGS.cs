@@ -9,6 +9,37 @@ namespace EternalDecay.Content.Configs
     internal class STRINGS
     {
 
+        public class UI
+        {
+            public class TEST
+            {
+                public static LocString NAME = new LocString("Test Dialog");
+            }
+
+
+
+            public class INFOSCREEN
+            {
+                public class TRAITS
+                {
+                    public static LocString NAME = "特质遗产";
+
+                }
+                public class RESUME
+                {
+                    public static LocString NAME = "技能知识遗产";
+
+                }
+                public class ATTRIBUTES
+                {
+                    public static LocString NAME = "属性知识遗产";
+
+                }
+
+
+            }
+        }
+
         public class ITEMS 
         {
             public class INDUSTRIAL_PRODUCTS 
@@ -28,11 +59,32 @@ namespace EternalDecay.Content.Configs
             }
         }
 
+        public class BUILDINGS
+        {
+            public class PREFABS
+            {
+                public class WATERCOOLER
+                {
+
+                    public class OPTION_TOOLTIPS
+                    {
+                        public static LocString KMODMINIBRAINBAD = "罐中脑脑积液";
+                    }
+                }
+            }
+        }
+
+
 
         public class DUPLICANTS 
         {
             public class MODIFIERS 
             {
+                public class LUMINESCENCEKING
+                {
+                    public static LocString NAME = "帝皇";
+                    public static LocString TOOLTIP = "发光";
+                }
                 public class ETERNALDECAY_SHUAILAO 
                 {
                     public static LocString NAME = "衰老";
@@ -70,6 +122,10 @@ namespace EternalDecay.Content.Configs
         {
             public class NOTIFICATIONS
             {
+                public class DEATHROULETTE
+                {
+                    public static LocString NAME = "进入衰老期"; 
+                }
                 public class AGEATTRIBUTE
                 {
                     public static LocString NAME = "自然衰老";

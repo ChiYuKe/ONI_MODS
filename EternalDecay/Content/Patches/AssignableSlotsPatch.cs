@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Database;
+using EternalDecay.Content.Configs;
 using HarmonyLib;
 using UnityEngine;
 
@@ -61,7 +62,7 @@ namespace EternalDecay.Content.Patches
                     //  Debug.Log($"获取到的targetGO.name ：{targetGO.name}");
 
 
-                    if (prefabID.HasTag("Assigned") || prefabID.HasTag("Corpse"))
+                    if (prefabID.HasTag(KGameTags.Assigned) || prefabID.HasTag(GameTags.Corpse) || prefabID.HasTag(GameTags.Minions.Models.Bionic))
                     {
                         // Debug.Log($"获取到的过滤标签后的targetGO.name ：{targetGO.name}");
                         __instance.gameObject.SetActive(false);

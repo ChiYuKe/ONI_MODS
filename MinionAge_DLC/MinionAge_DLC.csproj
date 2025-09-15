@@ -134,7 +134,7 @@
     <Compile Include="SpecializationTrigger\SpecializationTrigger.cs" />
     <Compile Include="STRINGS.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="test2.cs" />
+    <Compile Include="CustomButtons.cs" />
     <Compile Include="Tool\FXHManager.cs" />
     <Compile Include="Tool\KLogUtil.cs" />
     <Compile Include="Tool\KModAddClonedSideScreen.cs" />
