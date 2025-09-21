@@ -13,6 +13,9 @@ using EternalDecay.Content.Comps.DebuffCom;
 using System.IO;
 using STRINGS;
 using EternalDecay.Content.Comps.KUI;
+using static Satsuma.CompleteBipartiteGraph;
+using Color = UnityEngine.Color;
+using EternalDecay.Content.Configs;
 
 
 public class Accepttheinheritance : Workable
@@ -179,72 +182,68 @@ public class Accepttheinheritance : Workable
         }
         minion.AddOrGet<AbyssophobiaDebuff>();
 
-
-        // --- 弹出窗口 ---
-        GameObject canvas = GameObject.Find("ScreenSpaceOverlayCanvas");
-
-        var dialog = Util.KInstantiateUI<InfoDialogScreen>(
-            ScreenPrefabs.Instance.InfoDialogScreen.gameObject, // 复用游戏自带的 InfoDialogScreen prefab
-            canvas, // 父节点（canvas）
-            true
-        );
-
-        // 组装 UI
-        dialog
-            .SetHeader("任务提示")
-            .AddPlainText("你发现了一件古代遗物。是否要带回研究所？")
-            .AddSpacer(10f)
-            .AddLineItem("遗物: 古代雕像", "可能包含某些特殊属性")
-            .AddOption("带回去", d => Debug.Log("选择了带回去"))
-            .AddOption("放弃", d => Debug.Log("选择了放弃"), rightSide: true)
-            .AddDefaultCancel();
-
-
-
-
-        // var canvas = GameScreenManager.Instance.ssOverlayCanvas;
-
-
-        // 创建屏幕对象
-        var screenGO = new GameObject("MySimpleDialog");
-        var dialog1 = screenGO.AddComponent<SimpleDialogScreen>();
-
-        // 将屏幕对象放到 Canvas 下
-        screenGO.transform.SetParent(canvas.transform, false);
-
-        // 激活显示
-        dialog1.Activate();
-
-
-
-
-
-
-        //// 实例化 ConfirmDialogScreen
-        //var confirmDialog = Util.KInstantiateUI<ConfirmDialogScreen>(
-        //    ScreenPrefabs.Instance.ConfirmDialogScreen.gameObject,
-        //    canvas,
-        //    true
-        //);
-
-        //// 设置内容并显示
-        //confirmDialog.PopupConfirmDialog(
-        //    "确定要执行这个操作吗？",
-        //    on_confirm: () => Debug.Log("确认！"),
-        //    on_cancel: () => Debug.Log("取消！"),
-        //    title_text: "提示",
-        //    confirm_text: "确定",
-        //    cancel_text: "返回"
-        //);
-
-
-
-
-
+        ShowInheritanceInfo(minion);
 
 
     }
 
+
+    public void ShowInheritanceInfo(GameObject minion)
+    {
+        var oldAttributes = minion.GetComponent<AttributeLevels>();
+        var newAttributes = this.gameObject.GetComponent<AttributeLevels>();
+
+        if (oldAttributes == null)
+        {
+            Debug.LogWarning("旧角色未找到 AttributeLevels 组件。");
+            return;
+        }
+
+        HashSet<string> filteredAttributes = new HashSet<string>
+        {
+            "Toggle","LifeSupport","Immunity","FarmTinker","PowerTinker"
+        };
+
+      
+        List<(string attrName, int oldLevel, int newLevel)> attrList = new();
+
+        foreach (var oldAttrLevel in oldAttributes)
+        {
+            var attribute = oldAttrLevel.attribute.Attribute;
+            if (filteredAttributes.Contains(attribute.Id))
+                continue;
+
+            string attrName = attribute.Name;
+            int oldLevel = oldAttrLevel.GetLevel();
+
+            var newAttrLevel = newAttributes.GetAttributeLevel(attribute.Id);
+            int newLevel = oldLevel;
+            if (newAttrLevel != null)
+            {
+                newLevel += newAttrLevel.GetLevel();
+                if (newLevel > TUNINGS.TIMERMANAGER.RANDOMDEBUFFTIMERMANAGER.TRANSFER.ATTRIBUTEMAXLEVEL)
+                    newLevel = TUNINGS.TIMERMANAGER.RANDOMDEBUFFTIMERMANAGER.TRANSFER.ATTRIBUTEMAXLEVEL;
+            }
+
+            attrList.Add((attrName, oldLevel, newLevel));
+        }
+
+        // 创建并显示面板
+        var screenGO = new GameObject("InheritanceInfo");
+        var rectTransform = screenGO.AddComponent<RectTransform>();
+        rectTransform.sizeDelta = new Vector2(300f, 500f);
+
+        KScreen kscreen = screenGO.AddComponent<InheritanceInformation>();
+        GameObject panel = InheritanceInformation.Createpanel(
+            "继承详情",
+            attrList, 
+            "关闭窗口"
+        );
+        panel.transform.SetParent(kscreen.transform, false);
+
+        screenGO.transform.SetParent(GameObject.Find("ScreenSpaceOverlayCanvas").transform, false);
+        kscreen.Activate();
+    }
 
 
 

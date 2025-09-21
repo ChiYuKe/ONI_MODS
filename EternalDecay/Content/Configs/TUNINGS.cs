@@ -23,6 +23,8 @@ namespace EternalDecay.Content.Configs
                 public class TRANSFER
                 {
                     public static int TRAITSMAXAMOUNT = 12; // 最大特质继承数量
+                    public static int ATTRIBUTEMAXLEVEL = 50; // 最大属性等级
+                    public static int SKILLMAXAMOUNT = 17; // 最大技能继承数量
                 }
 
             }

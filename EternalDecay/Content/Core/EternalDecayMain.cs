@@ -72,7 +72,6 @@ namespace EternalDecay.Content.Core
                 {
                     HandleDeath(minionGO);
                     KEffects.RemoveBuff(minionGO, KEffects.ETERNALDECAY_SHUAILAO);
-
                     MinionDataTransfer.GenerateNewObject(minionGO, minionGO.transform.position);
 
                 }
@@ -80,6 +79,8 @@ namespace EternalDecay.Content.Core
                 else if (currentAgeInSeconds >= Age80PercentThreshold)
                 {
                     KEffects.ApplyBuff(minionGO, KEffects.ETERNALDECAY_SHUAILAO);
+                    NotifyDeathApplied(minionGO);
+
                 }
             }
         }
@@ -104,16 +105,6 @@ namespace EternalDecay.Content.Core
 
 
         
-
-
-
-
-
-
-
-
-
-
 
 
 

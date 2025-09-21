@@ -40,6 +40,15 @@ namespace EternalDecay.Content.Patches
 
                     // 调用 MakeTab 方法
                     makeTabMethod.Invoke(__instance, new object[] { "MINION_AGE_TAB", "知识遗产", Assets.GetSprite("icon_display_screen_properties"), "查看当前的知识遗产", minionAgeTabObject });
+                    // 找到新生成的 tab
+                    var tabTransform = __instance.transform.Find("tab: MINION_AGE_TAB");
+                    if (tabTransform != null)
+                    {
+                        // 移动到第一个
+                        tabTransform.SetSiblingIndex(0);
+                        LogUtil.Log("Moved MINION_AGE_TAB to first position");
+                    }
+
                 }
                 else
                 {

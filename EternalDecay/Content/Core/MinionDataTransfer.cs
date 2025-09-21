@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using EternalDecay.Content.Comps;
 using EternalDecay.Content.Configs;
 using Klei.AI;
 using TUNING;
@@ -71,6 +72,33 @@ namespace EternalDecay.Content.Core
         // 转移技能
         public static void TransferSkills(GameObject oldMinion, GameObject newMinion)
         {
+            var oldResume = oldMinion.GetComponent<MinionResume>();
+            var newResume = newMinion.GetComponent<MinionBrainResume>();
+
+            if (oldResume != null && newResume != null)
+            {
+                int skillsAdded = 0;
+
+                foreach (var kvp in oldResume.MasteryBySkillID)
+                {
+                    if (skillsAdded >= TUNINGS.TIMERMANAGER.RANDOMDEBUFFTIMERMANAGER.TRANSFER.SKILLMAXAMOUNT)
+                    {
+                        break;
+                    }
+
+                    if (kvp.Value && !newResume.MasteryBySkillID.ContainsKey(kvp.Key))
+                    {
+                        newResume.MasteryBySkillID.Add(kvp.Key, true);
+                        skillsAdded++;
+                    }
+                }
+
+                if (newResume is MinionBrainResume newMinionResume && oldResume is MinionResume oldMinionResume)
+                {
+                    float experienceForSkills = CalculateExperienceForSkills(skillsAdded);
+                    newMinionResume.TotalExperienceGained += oldMinionResume.TotalExperienceGained + experienceForSkills;
+                }
+            }
 
         }
 
@@ -84,6 +112,46 @@ namespace EternalDecay.Content.Core
         public static void TransferAttributes(GameObject oldMinion, GameObject newMinion)
         {
 
+
+            var oldAttributes = oldMinion.GetComponent<AttributeLevels>();
+            var newAttributes = newMinion.GetComponent<AttributeLevels>();
+
+            if (oldAttributes != null && newAttributes != null)
+            {
+                foreach (var oldAttribute in oldAttributes)
+                {
+                    string attributeId = oldAttribute.attribute.Attribute.Id;
+                    int oldLevel = oldAttribute.GetLevel();
+                    float oldExperience = oldAttribute.experience;
+
+                    var newAttribute = newAttributes.GetAttributeLevel(attributeId);
+                    if (newAttribute != null)
+                    {
+                        int newLevel = newAttribute.GetLevel() + oldLevel;
+                        float newExperience = newAttribute.experience + oldExperience;
+
+                        if (newLevel > TUNINGS.TIMERMANAGER.RANDOMDEBUFFTIMERMANAGER.TRANSFER.ATTRIBUTEMAXLEVEL)
+                        {
+                            newLevel = TUNINGS.TIMERMANAGER.RANDOMDEBUFFTIMERMANAGER.TRANSFER.ATTRIBUTEMAXLEVEL;
+                         
+                        }
+
+                        newAttributes.SetLevel(attributeId, newLevel);
+                        newAttributes.SetExperience(attributeId, newExperience);
+                    }
+                    else
+                    {
+                        int newLevel = oldLevel > TUNINGS.TIMERMANAGER.RANDOMDEBUFFTIMERMANAGER.TRANSFER.ATTRIBUTEMAXLEVEL ? TUNINGS.TIMERMANAGER.RANDOMDEBUFFTIMERMANAGER.TRANSFER.ATTRIBUTEMAXLEVEL : oldLevel;
+                        newAttributes.SetLevel(attributeId, newLevel);
+                        newAttributes.SetExperience(attributeId, oldExperience);
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogWarning("新对象上未找到 AttributeLevels 组件.");
+            }
+
         }
 
         // 设置新大脑的名字
@@ -93,15 +161,6 @@ namespace EternalDecay.Content.Core
             var newNameable = newMinion.AddOrGet<UserNameable>();
             newNameable.SetName(oldName + Configs.STRINGS.MISC.NEWMINIONNAME.NAME);
         }
-
-
-
-
-
-
-
-
-
 
     }
 }

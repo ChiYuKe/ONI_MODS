@@ -28,7 +28,6 @@ namespace CykUtils
 
             Parent = parentBuilder;
 
-            Debug.Log($"[UIBuilder] 创建 GameObject: {name}, size: {rect.sizeDelta}");
         }
 
         // 返回父节点，链式结束
@@ -76,38 +75,37 @@ namespace CykUtils
         }
 
         // Text 自动创建子物体
-        public UIBuilder AddText(string text, int fontSize = 14, TextAlignmentOptions align = TextAlignmentOptions.Center, Color? color = null)
+        public UIBuilder AddText(string text, int fontSize, TextAlignmentOptions align, Color color, out TextMeshProUGUI tmp)
         {
             var textGO = new GameObject("Text");
             textGO.transform.SetParent(GameObject.transform, false);
 
-            var tmp = textGO.AddComponent<TextMeshProUGUI>();
+            tmp = textGO.AddComponent<TextMeshProUGUI>();
             tmp.text = text;
             tmp.fontSize = fontSize;
             tmp.alignment = align;
-            tmp.color = color ?? Color.white;
+            tmp.color = color;
             tmp.raycastTarget = false;
 
             if (tmp.font == null)
                 tmp.font = TMPro.TMP_Settings.defaultFontAsset
                            ?? Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
 
-            Debug.Log($"[UIBuilder] AddText: '{text}', fontSize={fontSize}, align={align}, color={tmp.color}");
             return this;
         }
 
+
         // Button 自动创建子物体 Image
-        public UIBuilder AddButton(System.Action onClick, Color? bgColor = null, string sprite = null , Image.Type type = Image.Type.Sliced)
+        public UIBuilder AddButton(System.Action onClick, string sprite = null , Image.Type type = Image.Type.Sliced)
         {
             // 如果没有 Image，则自动创建一个子 Image
             var img = GameObject.GetComponent<Image>();
             if (img == null)
-                AddImage(bgColor ?? new Color(0.243f, 0.263f, 0.341f), sprite, type);
+                AddImage(new Color(0.243f, 0.263f, 0.341f), sprite, type);
 
             var btn = GameObject.GetComponent<KButton>() ?? GameObject.AddComponent<KButton>();
             btn.OnClick += () => onClick?.Invoke();
 
-            Debug.Log($"[UIBuilder] AddButton: bgColor={bgColor}, sprite={sprite}");
             return this;
         }
 
@@ -154,6 +152,63 @@ namespace CykUtils
 
             return this;
         }
+
+        // 设置兄弟节点索引
+        public UIBuilder SetSiblingIndex(int index)
+        {
+            GameObject.transform.SetSiblingIndex(index);
+            return this;
+        }
+
+
+
+        /// <summary>
+        /// 获取当前节点下名字为 name 的子对象
+        /// </summary>
+        public UIBuilder GetChild(string name)
+        {
+            var child = GameObject.transform.Find(name);
+            if (child == null)
+            {
+                Debug.LogWarning($"[UIBuilder] 子对象 '{name}' 未找到");
+                return null;
+            }
+            return new UIBuilder(child.gameObject, this);
+        }
+
+
+
+        // 私有构造函数：只包装已有的 GameObject，不会新建
+        private UIBuilder(GameObject existingGO, UIBuilder parentBuilder = null)
+        {
+            GameObject = existingGO;
+            Parent = parentBuilder;
+        }
+
+
+
+        /// <summary>
+        /// 添加任意组件，并返回组件本身
+        /// </summary>
+        public T AddComponent<T>() where T : Component
+        {
+            var comp = GameObject.GetComponent<T>() ?? GameObject.AddComponent<T>();
+            return comp;
+        }
+
+        /// <summary>
+        /// 添加任意组件，并返回 UIBuilder，用于链式调用
+        /// </summary>
+        public UIBuilder AddComponent<T>(out T comp) where T : Component
+        {
+            comp = GameObject.GetComponent<T>() ?? GameObject.AddComponent<T>();
+            return this;
+        }
+
+
+
+
+
 
         // 添加子物体并返回子 UIBuilder
         public UIBuilder AddChild(string name, Vector2? size = null)

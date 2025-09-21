@@ -12,6 +12,8 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -35,10 +37,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Content\Comps\Accepttheinheritance.cs" />
+    <Compile Include="Content\Comps\Class1.cs" />
     <Compile Include="Content\Comps\ColorfulPulsatingLight2D.cs" />
     <Compile Include="Content\Comps\DebuffCom\AbyssophobiaDebuff.cs" />
     <Compile Include="Content\Utils\UI\Button.cs" />
-    <Compile Include="Content\Comps\KUI\CustomInfoDialogScreen.cs" />
+    <Compile Include="Content\Comps\KUI\InheritanceInformationScreen.cs" />
     <Compile Include="Content\Comps\MiniBrain.cs" />
     <Compile Include="Content\Comps\MinionBrainResume.cs" />
     <Compile Include="Content\Comps\Ownable.cs" />
@@ -88,6 +91,12 @@
       <HintPath>D:\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="PLib, Version=4.18.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Documents\Klei\OxygenNotIncluded\mods\Dev\EternalDecay\PLib.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
     <Reference Include="Unity.TextMeshPro">
       <HintPath>D:\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\Unity.TextMeshPro.dll</HintPath>
       <Private>False</Private>
@@ -98,6 +107,7 @@
     </Reference>
     <Reference Include="UnityEngine.ImageConversionModule">
       <HintPath>D:\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
       <HintPath>D:\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
