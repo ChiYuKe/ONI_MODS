@@ -95,7 +95,7 @@ namespace EternalDecay.Content.Core
             if (deathMonitor != null)
             {
                 minionGO.AddOrGet<KPrefabID>().AddTag(KGameTags.NoMourning, true);
-                minionGO.AddOrGet<KPrefabID>().AddTag("DieOfOldAge", true);
+                minionGO.AddOrGet<KPrefabID>().AddTag(KGameTags.DieOfOldAge, true);
                 deathMonitor.Kill(DeathsPatch.KDeaths.Aging);
 
                 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Database;
 using Epic.OnlineServices.Logging;
+using EternalDecay.Content.Comps;
 using EternalDecay.Content.Patches;
 using HarmonyLib;
 using Klei.AI;
@@ -45,7 +46,7 @@ namespace CustomButtons
                     return;
                 }
 
-                AddCustomButton(sandboxToggle, "icon_display_screen_properties", "一键换头发", "This is Button 1", 0, OnClickButton1);
+                AddCustomButton(sandboxToggle, "icon_display_screen_properties", "效果测试", "This is Button 1", 0, OnClickButton1);
                 AddCustomButton(sandboxToggle, "icon_display_screen_properties", "一键死亡", "This is Button 2", 1, OnClickButton2);
                 AddCustomButton(sandboxToggle, "icon_display_screen_properties", "干饭", "This is Button 3", 2, OnClickButton3);
 
@@ -82,28 +83,10 @@ namespace CustomButtons
 
                 if (index == 0)
                 {
-                    //List<GameObject> minions = KModMinionUtils.GetAllMinionGameObjects();
-
-                    //foreach (GameObject minion in minions)
-                    //{
-
-                    //    Accessorizer accessorizer = minion.GetComponent<Accessorizer>();
-                    //    if (accessorizer != null)
-                    //    {
-                    //        Accessory hair = accessorizer.GetAccessory(Db.Get().AccessorySlots.Hair);
-                    //        if (hair != null)
-                    //        {
-                    //            string hairSymbol = HashCache.Get().Get(hair.symbol.hash);
-                    //            LogUtil.Log(minion.name + " 的头发符号: " + hairSymbol);
-                    //        }
-                    //    }
-                    //}
-
-
-                    //KAnimFile newHairAnim = Assets.GetAnim("Testhair_kanim");
-                    //Color hairColor = new Color(1f, 1f, 1f, 1f);
-                    //KTAccessories.PrintAllHairSymbols(newHairAnim);
-                    //KTAccessories.ReplaceAllMinionHair(newHairAnim, hairColor);
+                    GameObject markerGO = new GameObject("CursorDurationMarker");
+                    AETE_CursorDurationMarker marker = markerGO.AddComponent<AETE_CursorDurationMarker>();
+                    marker.transform.parent = GameScreenManager.Instance.ssOverlayCanvas.transform;
+                    marker.Show(100, Color.green);
 
                 }
                 if (index == 1)
