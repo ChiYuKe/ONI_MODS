@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CykUtils;
 using Database;
+using EternalDecay.Content.Comps.DebuffCom;
 using HarmonyLib;
 using Klei.AI;
 using UnityEngine;
@@ -103,6 +104,7 @@ namespace EternalDecay.Content.Patches
             [HarmonyPatch("BaseMinion")]
             public static void Postfix_BaseMinion(GameObject __result)
             {
+                __result.AddComponent<DebuffContainer>(); // 添加DebuffContainer组件
 
             }
 
