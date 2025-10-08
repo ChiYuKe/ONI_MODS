@@ -1,21 +1,13 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using Klei.AI;
 using static EternalDecay.Content.Patches.ChoreTypesPatch;
 using System.Collections.Generic;
-using HarmonyLib;
-using System.Reflection;
-using EternalDecay.Content.Comps;
-using static UnityEngine.GraphicsBuffer;
-using static STRINGS.UI.UISIDESCREENS.AUTOPLUMBERSIDESCREEN.BUTTONS;
 using CykUtils;
 using EternalDecay.Content.Comps.DebuffCom;
-using System.IO;
-using STRINGS;
 using EternalDecay.Content.Comps.KUI;
-using static Satsuma.CompleteBipartiteGraph;
 using Color = UnityEngine.Color;
 using EternalDecay.Content.Configs;
+using static STRINGS.UI.UISIDESCREENS.AUTOPLUMBERSIDESCREEN.BUTTONS;
 
 
 public class Accepttheinheritance : Workable
@@ -104,10 +96,6 @@ public class Accepttheinheritance : Workable
 
 
 
-
-
-
-
     private void ActivateChore()
     {
         Debug.Assert(this.chore == null);
@@ -143,7 +131,7 @@ public class Accepttheinheritance : Workable
             1.5f,                                        // 显示时长
             false                                        // 是否跟随物体移动
           );
-        targetGameObject.AddOrGet<KPrefabID>().AddTag("Assigned", true);// 有这个tag的不会显示在那个罐中脑列表里面
+        targetGameObject.AddOrGet<KPrefabID>().AddTag(KGameTags.Assigned, true);// 有这个tag的不会显示在那个罐中脑列表里面
     }
 
 
@@ -151,6 +139,11 @@ public class Accepttheinheritance : Workable
     protected override void OnAbortWork(WorkerBase worker)
     {
         base.OnAbortWork(worker);
+        GameObject minion = worker.gameObject;
+
+        // minion.AddOrGet<AbyssophobiaDebuff>();
+        minion.AddOrGet<KPrefabID>().AddTag(KGameTags.CreatureAbyssophobia, true); // 添加恐惧深渊标签控制AbyssophobiaDebuff组件是否启用
+
         LogUtil.Log("工作中止");
     }
     protected override void OnStartWork(WorkerBase worker)
@@ -180,7 +173,7 @@ public class Accepttheinheritance : Workable
 
 
         }
-        minion.AddOrGet<AbyssophobiaDebuff>();
+       
 
         ShowInheritanceInfo(minion);
 
