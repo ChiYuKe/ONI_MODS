@@ -13,7 +13,15 @@ namespace EternalDecay.Content.Configs
 
         public static readonly Tag NoMourning = TagManager.Create("NoMourning"); // 无哀悼标签
 
-       
+        public static readonly Tag CreatureAbyssophobia = TagManager.Create("CreatureAbyssophobia"); // 深渊恐惧标签
+
+        public static readonly Tag DieOfOldAge = TagManager.Create("DieOfOldAge"); // 老死标签
+
+
+
+
+
+
 
 
 
