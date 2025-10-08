@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using PeterHan.PLib.UI;
 using System;
 using System.Collections.Generic;
+using KMod;
 
 
 namespace EternalDecay.Content.Comps.KUI
@@ -12,7 +13,7 @@ namespace EternalDecay.Content.Comps.KUI
         protected override void OnSpawn()
         {
             base.OnSpawn();
-            ConsumeMouseScroll = true;  // 这句告诉 KScreen 阻止滚轮事件
+            ConsumeMouseScroll = true; 
 
         }
 
@@ -45,72 +46,20 @@ namespace EternalDecay.Content.Comps.KUI
                 Margin = new RectOffset(5, 5, 5, 5)
             });
 
+
+
+
+
             // 中间滚动部分
             var middleContent = new PPanel("MiddleContent")
             {
                 Direction = PanelDirection.Vertical,
-                Alignment = TextAnchor.UpperLeft,
-                FlexSize = new Vector2(1, 0),
-                Margin = new RectOffset(5, 10, 2, 2),
-                Spacing = 2
+                Spacing = 10,
+                FlexSize = new Vector2(1, 0)
             };
-
-            int index = 0;
-            foreach (var (attrName, oldLevel, newLevel) in attrList)
-            {
-                var card = new PPanel($"AttrCard_{index}")
-                {
-                    Direction = PanelDirection.Horizontal,
-                    Alignment = TextAnchor.MiddleCenter,
-                    Spacing = 10,
-                    FlexSize = new Vector2(1, 0),
-                    BackImage = PUITuning.Images.GetSpriteByName("web_rounded"),
-                    ImageMode = Image.Type.Sliced,
-                    BackColor = new Color(0.75f, 0.75f, 0.75f, 1f),
-                    Margin = new RectOffset(5, 5, 2, 2)
-                }
-                // 左边：属性名
-                .AddChild(new PLabel($"Name_{index}")
-                {
-                    Text = attrName,
-                    TextStyle = PUITuning.Fonts.TextDarkStyle,
-                    FlexSize = new Vector2(1, 0),
-                    TextAlignment = TextAnchor.MiddleLeft
-                })
-                // 中间：旧等级
-                .AddChild(new PLabel($"Old_{index}")
-                {
-                    Text = $"Lv.{oldLevel}",
-                    TextStyle = PUITuning.Fonts.TextLightStyle,
-                    TextAlignment = TextAnchor.MiddleCenter,
-                    FlexSize = new Vector2(0, 0)
-                })
-                // 箭头
-                .AddChild(new PLabel($"Arrow_{index}")
-                {
-                    Text = "→",
-                    TextStyle = newLevel > oldLevel
-                        ? CustomStyles.GreenText   // 升级 → 绿色
-                        : PUITuning.Fonts.TextDarkStyle,     // 没变/降低
-                    FlexSize = new Vector2(0, 0), 
-                    TextAlignment = TextAnchor.MiddleCenter,
-                    Margin = new RectOffset(5, 5, 0, 0)
-                })
-                // 新等级
-                .AddChild(new PLabel($"New_{index}")
-                {
-                    Text = $"Lv.{newLevel}",
-                    TextStyle = newLevel > oldLevel
-                        ? CustomStyles.GreenText   // 升级 → 绿色
-                        : PUITuning.Fonts.TextDarkStyle,     // 没变/降低
-
-                    TextAlignment = TextAnchor.MiddleRight,
-                    FlexSize = new Vector2(0, 0)
-                });
-
-                middleContent.AddChild(card);
-                index++;
-            }
+            middleContent.AddChild(CreateAttributeBlock(attrList));
+            middleContent.AddChild(CreateSkillBlock());
+            middleContent.AddChild(CreateTraitBlock());
 
             var middle = new PScrollPane("MiddleScroll")
             {
@@ -120,8 +69,16 @@ namespace EternalDecay.Content.Comps.KUI
                 AlwaysShowVertical = true,
                 FlexSize = new Vector2(1, 1),
                 TrackSize = 8f,
-                BackColor = new Color(1f, 1f, 1f, 1f)
+                BackColor = Color.white
             };
+
+
+
+
+
+
+
+
 
             // 底部按钮
             var bottom = new PPanel("Bottom")
@@ -141,9 +98,155 @@ namespace EternalDecay.Content.Comps.KUI
             return root.Build();
         }
 
-         public static TextStyleSetting TextLightStyle { get; }
+        /// <summary>
+        /// 创建“属性”区块 (标题 + 属性卡片列表)
+        /// </summary>
+        private static PPanel CreateAttributeBlock(List<(string attrName, int oldLevel, int newLevel)> attrList)
+        {
+            // 外层容器：标题 + 内容
+            var wrapper = new PPanel("AttrWrapper")
+            {
+                Direction = PanelDirection.Vertical,
+                Alignment = TextAnchor.UpperLeft,
+                FlexSize = new Vector2(1, 0),
+                Margin = new RectOffset(5, 10, 5, 5),
+                Spacing = 4,
+                BackImage = PUITuning.Images.GetSpriteByName("web_box"),
+                ImageMode = Image.Type.Sliced,
+                BackColor = new Color(0.24f, 0.3f, 0.4072f, 1f)
+            };
 
-        // border_basic_white web_rounded
+            // 标题
+            wrapper.AddChild(new PLabel("AttrTitle")
+            {
+                Text = "属性",
+                TextStyle = CustomStyles.BigLightStyle,
+
+                ToolTip = "继承后属性变化",
+                TextAlignment = TextAnchor.UpperCenter,
+                Margin = new RectOffset(2, 2, 2, 4)
+            });
+
+            // 内容区域：放卡片
+            var content = new PPanel("AttrContent")
+            {
+                Direction = PanelDirection.Vertical,
+                Alignment = TextAnchor.UpperLeft,
+                FlexSize = new Vector2(1, 0),
+                Spacing = 2
+            };
+
+            int index = 0;
+            foreach (var (attrName, oldLevel, newLevel) in attrList)
+            {
+                var card = new PPanel($"AttrCard_{index}")
+                {
+                    Direction = PanelDirection.Horizontal,
+                    Alignment = TextAnchor.MiddleCenter,
+                    Spacing = 10,
+                    FlexSize = new Vector2(1, 0),
+                    BackImage = PUITuning.Images.GetSpriteByName("web_rounded"),
+                    ImageMode = Image.Type.Sliced,
+                    BackColor = new Color(0.75f, 0.75f, 0.75f, 1f),
+                    Margin = new RectOffset(5, 5, 2, 2)
+                }
+                // 属性名
+                .AddChild(new PLabel($"Name_{index}")
+                {
+                    Text = attrName,
+                    TextStyle = PUITuning.Fonts.TextDarkStyle,
+                    FlexSize = new Vector2(1, 0),
+                    TextAlignment = TextAnchor.MiddleLeft
+                })
+                // 旧等级
+                .AddChild(new PLabel($"Old_{index}")
+                {
+                    Text = $"Lv.{oldLevel}",
+                    TextStyle = PUITuning.Fonts.TextLightStyle,
+                    TextAlignment = TextAnchor.MiddleCenter
+                })
+                // 箭头
+                .AddChild(new PLabel($"Arrow_{index}")
+                {
+                    Text = "→",
+                    TextStyle = newLevel > oldLevel ? CustomStyles.GreenText : PUITuning.Fonts.TextDarkStyle,
+                    TextAlignment = TextAnchor.MiddleCenter,
+                    Margin = new RectOffset(5, 5, 0, 0)
+                })
+                // 新等级
+                .AddChild(new PLabel($"New_{index}")
+                {
+                    Text = $"Lv.{newLevel}",
+                    TextStyle = newLevel > oldLevel ? CustomStyles.GreenText : PUITuning.Fonts.TextDarkStyle,
+                    TextAlignment = TextAnchor.MiddleRight
+                });
+
+                content.AddChild(card);
+                index++;
+            }
+
+            wrapper.AddChild(content);
+            return wrapper;
+        }
+
+
+        // 技能列表
+        private static PPanel CreateSkillBlock() 
+        {
+            var wrapper = new PPanel("SkillWrapper")
+            {
+                Direction = PanelDirection.Vertical,
+                Alignment = TextAnchor.UpperLeft,
+                FlexSize = new Vector2(1, 0),
+                Margin = new RectOffset(5, 10, 5, 5),
+                Spacing = 4,
+                BackImage = PUITuning.Images.GetSpriteByName("web_box"),
+                ImageMode = Image.Type.Sliced,
+                BackColor = new Color(0.24f, 0.3f, 0.4072f, 1f)
+            };
+
+            // 标题
+            wrapper.AddChild(new PLabel("SkillTitle")
+            {
+                Text = "技能",
+                TextStyle = CustomStyles.BigLightStyle,
+                TextAlignment = TextAnchor.UpperCenter,
+                Margin = new RectOffset(2, 2, 2, 4)
+            });
+
+            return wrapper;
+
+
+        }
+
+        // 特质列表
+        private static PPanel CreateTraitBlock()
+        {
+            var wrapper = new PPanel("TraitWrapper")
+            {
+                Direction = PanelDirection.Vertical,
+                Alignment = TextAnchor.UpperLeft,
+                FlexSize = new Vector2(1, 0),
+                Margin = new RectOffset(5, 10, 5, 5),
+                Spacing = 4,
+                BackImage = PUITuning.Images.GetSpriteByName("web_box"),
+                ImageMode = Image.Type.Sliced,
+                BackColor = new Color(0.24f, 0.3f, 0.4072f, 1f)
+            };
+            // 标题
+            wrapper.AddChild(new PLabel("TraitTitle")
+            {
+                Text = "特质",
+                TextStyle = CustomStyles.BigLightStyle,
+                TextAlignment = TextAnchor.UpperCenter,
+                Margin = new RectOffset(2, 2, 2, 4)
+            });
+            return wrapper;
+            }
+
+
+
+        // border_basic_white  web_rounded
 
         private static void close(GameObject _)
         {
@@ -151,21 +254,28 @@ namespace EternalDecay.Content.Comps.KUI
             UnityEngine.Object.Destroy(GameObject.Find("InheritanceInfo"));
 
         }
+
     }
 
-    // 工具类里做一次缓存，避免重复 new
+    // 缓存，避免重复 new
     public static class CustomStyles
     {
         public static readonly TextStyleSetting GreenText;
         public static readonly TextStyleSetting RedText;
+        public static readonly TextStyleSetting BigLightStyle;
 
         static CustomStyles()
         {
             // 基于 PUITuning.Fonts.TextDarkStyle 派生
             GreenText = PUITuning.Fonts.TextDarkStyle.DeriveStyle(0, new Color(1f, 1f, 0f, 1f));
             RedText = PUITuning.Fonts.TextDarkStyle.DeriveStyle(0, Color.red);
-        }
-    }
+            BigLightStyle = PUITuning.Fonts.TextLightStyle.DeriveStyle(
+                size: 20,   
+                newColor: new Color(1f, 1f, 1f, 1f)  
+            );
 
+        }
+
+    }
 
 }
