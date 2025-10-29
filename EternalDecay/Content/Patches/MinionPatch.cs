@@ -104,7 +104,7 @@ namespace EternalDecay.Content.Patches
             [HarmonyPatch("BaseMinion")]
             public static void Postfix_BaseMinion(GameObject __result)
             {
-                __result.AddComponent<DebuffContainer>(); // 添加DebuffContainer组件
+                __result.AddComponent<Trigger>(); // 添加DebuffContainer组件
 
             }
 

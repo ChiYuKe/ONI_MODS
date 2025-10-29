@@ -1,12 +1,7 @@
-﻿
-using System.Collections.Generic;
-using System.Linq;
-using CykUtils;
-using EternalDecay.Content.Comps;
+﻿using CykUtils;
 using EternalDecay.Content.Core;
 using HarmonyLib;
 using KMod;
-using UnityEngine;
 
 namespace EternalDecay
 {
@@ -17,9 +12,12 @@ namespace EternalDecay
             public override void OnLoad(Harmony harmony)
             {
                 base.OnLoad(harmony);
-                LogUtil.Log("MOD加载成功");
-
+                ModAssets.LoadAll();// 提前注册到游戏当中
                 EternalDecayInitializer.Initialize();
+                LogUtil.Log("MOD加载成功");
+               
+
+                
 
             }
 
