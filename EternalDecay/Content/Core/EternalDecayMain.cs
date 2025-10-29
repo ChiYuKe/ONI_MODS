@@ -94,8 +94,8 @@ namespace EternalDecay.Content.Core
             var deathMonitor = minionGO.GetSMI<DeathMonitor.Instance>();
             if (deathMonitor != null)
             {
-                minionGO.AddOrGet<KPrefabID>().AddTag(KGameTags.NoMourning, true);
-                minionGO.AddOrGet<KPrefabID>().AddTag(KGameTags.DieOfOldAge, true);
+                minionGO.AddOrGet<KPrefabID>().AddTag(KGameTags.NoMourning, true);// 带有 NoMourning 标签，阻断全体哀悼DeBuff
+                minionGO.AddOrGet<KPrefabID>().AddTag(KGameTags.DieOfOldAge, true); 
                 deathMonitor.Kill(DeathsPatch.KDeaths.Aging);
 
                 

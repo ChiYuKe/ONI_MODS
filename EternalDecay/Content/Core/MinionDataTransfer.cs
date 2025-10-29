@@ -11,6 +11,7 @@ using UnityEngine;
 
 namespace EternalDecay.Content.Core
 {
+    // 生成一个大脑并将复制人数据传入大脑
     internal class MinionDataTransfer
     {
         public static void GenerateNewObject(GameObject oldMinion, Vector3 position)
@@ -35,6 +36,7 @@ namespace EternalDecay.Content.Core
             TransferAttributesAndSkills(oldMinion, newMinion);
             SetNewMinionName(oldMinion, newMinion);
         }
+
 
         // 转移旧对象的特质、技能和属性到新对象
         private static void TransferAttributesAndSkills(GameObject oldMinion, GameObject newMinion)
@@ -102,12 +104,6 @@ namespace EternalDecay.Content.Core
 
         }
 
-        // 计算技能点所需的经验值
-        private static float CalculateExperienceForSkills(int skillsAdded)
-        {
-            return Mathf.Pow((skillsAdded / (float)SKILLS.TARGET_SKILLS_EARNED), SKILLS.EXPERIENCE_LEVEL_POWER) * SKILLS.TARGET_SKILLS_CYCLE * 600f;
-        }
-
         // 转移属性
         public static void TransferAttributes(GameObject oldMinion, GameObject newMinion)
         {
@@ -152,6 +148,13 @@ namespace EternalDecay.Content.Core
                 Debug.LogWarning("新对象上未找到 AttributeLevels 组件.");
             }
 
+        }
+
+
+        // 计算技能点所需的经验值
+        private static float CalculateExperienceForSkills(int skillsAdded)
+        {
+            return Mathf.Pow((skillsAdded / (float)SKILLS.TARGET_SKILLS_EARNED), SKILLS.EXPERIENCE_LEVEL_POWER) * SKILLS.TARGET_SKILLS_CYCLE * 600f;
         }
 
         // 设置新大脑的名字
