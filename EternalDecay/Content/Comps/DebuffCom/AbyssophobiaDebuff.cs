@@ -6,20 +6,20 @@ using UnityEngine;
 
 namespace EternalDecay.Content.Comps.DebuffCom
 {
-    public class AbyssophobiaDebuff : KMonoBehaviour, ISim4000ms
+    public class AbyssophobiaDebuff
     {
         // 场景中建筑的 ID（优先使用第一个 ID）
-        public string buildingID = "HeadquartersComplete"; //打印舱
-        public string buildingID2 = "ExobaseHeadquartersComplete"; //迷你基地打印舱
+        private static readonly string buildingID = "HeadquartersComplete"; //打印舱
+        private static readonly string buildingID2 = "ExobaseHeadquartersComplete"; //迷你基地打印舱
 
-        private GameObject building;  // 场景中的某个建筑对象
+        private static GameObject building;  // 场景中的某个建筑对象
 
         // debuff 的基础值、增幅值和阈值
         public float debuffBaseValue = 1f;
         public float debuffMultiplier = 1f;
 
         // 设定每个 Y 坐标差异区间与对应的 debuff 等级
-        private readonly (float threshold, int level)[] debuffThresholds = new (float, int)[]
+        private static readonly (float threshold, int level)[] debuffThresholds = new (float, int)[]
         {
             (5f, 0),    
             (25f, 1),   
@@ -29,7 +29,7 @@ namespace EternalDecay.Content.Comps.DebuffCom
             (105f, 5),  
         };
 
-        private string[] abyssophobiaEffects = new string[]
+        private static string[] abyssophobiaEffects = new string[]
         {
             "EternalDecay_Abyssophobia_0",
             "EternalDecay_Abyssophobia_1",
@@ -42,25 +42,29 @@ namespace EternalDecay.Content.Comps.DebuffCom
 
         private int debuffLevel = 0;  // 当前的 debuff 级别
 
-        protected override void OnSpawn()
+
+
+        public static void TriggerScan(GameObject minion) 
         {
-            base.OnSpawn();
-
-            building = GetBuildingByID(buildingID) ?? GetBuildingByID(buildingID2);
-
-            if (building == null)
+            // 确保 minion 对象存在
+            if (minion == null)
             {
-                Debug.LogWarning("无法找到建筑！");
+                Debug.LogError("Minion 对象不能为空！");
+                return;
             }
-        }
 
-        void ISim4000ms.Sim4000ms(float dt)
-        {
-            if (building == null || this.gameObject == null) return;    
-            if (!this.gameObject.HasTag(KGameTags.CreatureAbyssophobia)) return;
+            // 获取 minion 的 KPrefabID 组件
+            var prefabID = minion.GetComponent<KPrefabID>();
+            if (prefabID == null || !prefabID.HasTag(KGameTags.CreatureAbyssophobia)) 
+            {
+                return;
+            }
 
+            // 初始化建筑物，只会执行一次
+            InitializeBuilding();
+            if (building == null) return;
 
-            float targetY = this.gameObject.transform.position.y;
+            float targetY = minion.transform.position.y;
             float buildingY = building.transform.position.y;
 
             // 计算 Y 坐标差值（不取绝对值）
@@ -69,23 +73,42 @@ namespace EternalDecay.Content.Comps.DebuffCom
 
 
             // 通过差异找到对应的 debuff 级别
-            debuffLevel = GetDebuffLevel(yDifference);
+            int debuffLevel = GetDebuffLevel(yDifference);
 
+
+
+
+            if (prefabID.HasTag(GameTags.Corpse))
+            {
+                KEffects.RemoveBuff(minion, abyssophobiaEffects[debuffLevel]);
+                return; 
+            }
+
+  
             // 应用 debuff
-            ApplyAbyssophobiaDebuff(debuffLevel);
+            ApplyAbyssophobiaDebuff(minion,debuffLevel);
+        }
+
+
+        // 在类初始化时（只执行一次）获取建筑物对象
+        private static void InitializeBuilding()
+        {
+            if (building == null)
+            {
+                building = GetBuildingByID(buildingID) ?? GetBuildingByID(buildingID2);
+            }
         }
 
 
 
-
         // 通过建筑 ID 查找建筑对象
-        private GameObject GetBuildingByID(string buildingID)
+        private static GameObject GetBuildingByID(string buildingID)
         {
             return GameObject.Find(buildingID);  
         }
 
         // 计算 debuff 级别
-        private int GetDebuffLevel(float yDifference)
+        private static int GetDebuffLevel(float yDifference)
         {
             // 遍历预设的阈值和级别
             foreach (var (threshold, level) in debuffThresholds)
@@ -104,15 +127,15 @@ namespace EternalDecay.Content.Comps.DebuffCom
 
 
 
-        private int currentLevel = -1;
-        private bool hasNotified = false; // 记录是否已经通知过
+        private static int currentLevel = -1;
+        private static bool hasNotified = false; // 记录是否已经通知过
 
-        private void ApplyAbyssophobiaDebuff(int newLevel)
+        private static void ApplyAbyssophobiaDebuff(GameObject minion, int newLevel)
         {
-            if (gameObject == null) return;
+            if (minion == null) return;
             if (newLevel == currentLevel) return; // 等级没变，不更新
 
-            var effects = gameObject.GetComponent<Effects>();
+            var effects = minion.GetComponent<Effects>();
             if (effects == null) return;
 
             // 移除旧 Buff
@@ -134,7 +157,7 @@ namespace EternalDecay.Content.Comps.DebuffCom
             // ✅ 通知逻辑：仅首次触发执行一次
             if (!hasNotified)
             {
-                NotifyAbyssophobia(gameObject);
+                NotifyAbyssophobia(minion);
                 hasNotified = true;
             }
 
