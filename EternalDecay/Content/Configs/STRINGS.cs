@@ -73,6 +73,18 @@ namespace EternalDecay.Content.Configs
                 }
             }
         }
+        public class KUI
+        {
+            public static string FormatAsHotkey(string text)
+            {
+                return "<b><color=#F44A4A>" + text + "</b></color>";
+            }
+
+            public static string FormatAsBold(string text)
+            {
+                return "<b>" + text + "</b>";
+            }
+        }
 
 
 
@@ -95,6 +107,25 @@ namespace EternalDecay.Content.Configs
                     public static LocString NAME = "稳定期";
                     public static LocString TOOLTIP = "稳定期为 0 时，罐中脑会直接损坏";
                 }
+
+                public class HEATWANDERER
+                {
+                    public static LocString NAME = KUI.FormatAsHotkey("散热者");
+                    public static LocString TOOLTIP = $"{KUI.FormatAsBold("继承失败所造成的负面效果:")} \n\n  周期性的使自身降温，周围物体升温 \n 降温自身温度不会低于15 ℃，升温周围物体不会高于50 ℃";
+                }
+                public class COOLWANDERER
+                {
+                    public static LocString NAME = KUI.FormatAsHotkey("积热者");
+                    public static LocString TOOLTIP = $"{KUI.FormatAsBold("继承失败所造成的负面效果:")} \n\n 周期性的使自身升温，周围物体降温 \n 降温周围物体温度不会低于0 ℃，升温自身不会高于55";
+                }
+                public class SCORCHINGMETALSHARER
+                {
+                    public static LocString NAME = KUI.FormatAsHotkey("炽热金属分享者");
+                    public static LocString TOOLTIP = $"{KUI.FormatAsBold("食用特殊食物所造成的负面效果:")} \n\n 复制觉得有好东西要分享，至少这些东西比原神。。。烧  \n\n 周期性的向周围抛下200℃高温金属碎片 ";
+                    public static LocString DESCRIPTION = "复制人觉得这个食物感觉比. . . .原神. . .烧 ，而感到开心的丢高温金属";
+                }
+
+
                 public class ABYSSO
                 {
                     public class ABYSSO0

@@ -8,6 +8,7 @@ using EternalDecay.Content.Comps.KUI;
 using Color = UnityEngine.Color;
 using EternalDecay.Content.Configs;
 using static STRINGS.UI.UISIDESCREENS.AUTOPLUMBERSIDESCREEN.BUTTONS;
+using EternalDecay.Content.Core;
 
 
 public class Accepttheinheritance : Workable
@@ -143,6 +144,15 @@ public class Accepttheinheritance : Workable
 
         // minion.AddOrGet<AbyssophobiaDebuff>();
         minion.AddOrGet<KPrefabID>().AddTag(KGameTags.CreatureAbyssophobia, true); // 添加恐惧深渊标签控制AbyssophobiaDebuff组件是否启用
+        minion.AddOrGet<KPrefabID>().AddTag(KGameTags.HeatWanderer, true);
+        minion.AddOrGet<KPrefabID>().AddTag(KGameTags.CoolWanderer, true);
+        minion.AddOrGet<KPrefabID>().AddTag(KGameTags.ScorchingMetalSharer, true);
+
+
+
+        KEffects.ApplyBuff(minion, KEffects.ETERNALDECAY_HEATWANDERER);
+        KEffects.ApplyBuff(minion, KEffects.ETERNALDECAY_COOLWANDERER);
+        KEffects.ApplyBuff(minion, KEffects.ETERNALDECAY_SCORCHINGMETALSHARER);
 
         LogUtil.Log("工作中止");
     }
