@@ -14,45 +14,6 @@ namespace EternalDecay.Content.Patches
     {
 
 
-
-        [HarmonyPatch(typeof(HeadquartersConfig), "ConfigureBuildingTemplate")]
-        public static class HeadquartersConfigPatch
-        {
-            public static void Postfix(GameObject go, Tag prefab_tag)
-            {
-                Light2D light2D = go.GetComponent<Light2D>();
-                if (light2D != null)
-                {
-                    light2D.drawOverlay = false;
-                }
-            }
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         #region 注册年龄和衰老属性
         [HarmonyPatch(typeof(Database.Amounts), "Load")]
         [HarmonyPriority(Priority.First)]

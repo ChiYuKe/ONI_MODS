@@ -264,18 +264,4 @@ namespace EternalDecay.Content.Patches
         private CollapsibleDetailContentPanel D;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
