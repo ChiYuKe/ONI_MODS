@@ -126,7 +126,7 @@ public class Accepttheinheritance : Workable
         GameObject.Destroy(this.gameObject);
 
         var popfx = PopFXManager.Instance.SpawnFX(
-            Assets.GetSprite("icon_action_upgrade"),       // 图标
+            Assets.GetSprite("akisextratwitchevents_small_ring"),       // 图标
             "继承成功", // 文本
             targetGameObject.transform,                          // 复制人位置
             1.5f,                                        // 显示时长
@@ -154,104 +154,27 @@ public class Accepttheinheritance : Workable
         KEffects.ApplyBuff(minion, KEffects.ETERNALDECAY_COOLWANDERER);
         KEffects.ApplyBuff(minion, KEffects.ETERNALDECAY_SCORCHINGMETALSHARER);
 
-        LogUtil.Log("工作中止");
+        // LogUtil.Log("工作中止");
     }
     protected override void OnStartWork(WorkerBase worker)
     {
         base.OnStartWork(worker);
-        LogUtil.Log("开始工作");
+        // LogUtil.Log("开始工作");
        
     }
 
     protected override void OnCompleteWork(WorkerBase worker)
     {
         base.OnCompleteWork(worker);
-        GameObject minion = worker.gameObject;
-
-        if (minion != null && minion.GetComponent<ColorfulPulsatingLight2D>() == null)
-        {
-            var light = minion.AddComponent<ColorfulPulsatingLight2D>();
-            light.PulseSpeed = 1.5f;
-            light.MinIntensity = 800f;
-            light.MaxIntensity = 2000f;
-            light.MinRadius = 4f;
-            light.MaxRadius = 8f;
-            light.Colors = new Color[] { Color.red, Color.yellow, Color.green };
-            LogUtil.Log($"{minion.name} 已添加 ColorfulPulsatingLight2D 组件");
-
-           
+        GameObject workerminion = worker.gameObject;// 获取正在工作的角色对象
+        GameObject gameObject = this.gameObject;// 获取当前大脑对象
 
 
-        }
-       
-
-        ShowInheritanceInfo(minion);
+        ShowMinionInfo.ShowInheritanceInfo(workerminion, gameObject);
 
 
     }
-
-
-    public void ShowInheritanceInfo(GameObject minion)
-    {
-        var oldAttributes = minion.GetComponent<AttributeLevels>();
-        var newAttributes = this.gameObject.GetComponent<AttributeLevels>();
-
-        if (oldAttributes == null)
-        {
-            Debug.LogWarning("旧角色未找到 AttributeLevels 组件。");
-            return;
-        }
-
-        HashSet<string> filteredAttributes = new HashSet<string>
-        {
-            "Toggle","LifeSupport","Immunity","FarmTinker","PowerTinker"
-        };
-
-      
-        List<(string attrName, int oldLevel, int newLevel)> attrList = new();
-
-        foreach (var oldAttrLevel in oldAttributes)
-        {
-            var attribute = oldAttrLevel.attribute.Attribute;
-            if (filteredAttributes.Contains(attribute.Id))
-                continue;
-
-            string attrName = attribute.Name;
-            int oldLevel = oldAttrLevel.GetLevel();
-
-            var newAttrLevel = newAttributes.GetAttributeLevel(attribute.Id);
-            int newLevel = oldLevel;
-            if (newAttrLevel != null)
-            {
-                newLevel += newAttrLevel.GetLevel();
-                if (newLevel > TUNINGS.TIMERMANAGER.RANDOMDEBUFFTIMERMANAGER.TRANSFER.ATTRIBUTEMAXLEVEL)
-                    newLevel = TUNINGS.TIMERMANAGER.RANDOMDEBUFFTIMERMANAGER.TRANSFER.ATTRIBUTEMAXLEVEL;
-            }
-
-            attrList.Add((attrName, oldLevel, newLevel));
-        }
-
-        // 创建并显示面板
-        var screenGO = new GameObject("InheritanceInfo");
-        var rectTransform = screenGO.AddComponent<RectTransform>();
-        rectTransform.sizeDelta = new Vector2(300f, 500f);
-
-        KScreen kscreen = screenGO.AddComponent<InheritanceInformation>();
-        GameObject panel = InheritanceInformation.Createpanel(
-            "继承详情",
-            attrList, 
-            "关闭窗口"
-        );
-        panel.transform.SetParent(kscreen.transform, false);
-
-        screenGO.transform.SetParent(GameObject.Find("ScreenSpaceOverlayCanvas").transform, false);
-        kscreen.Activate();
-    }
-
-
-
-
-
+   
 
 
     [MyCmpReq]
