@@ -11,11 +11,29 @@ namespace EternalDecay.Content.Configs
 
         public class UI
         {
-            public class TEST
-            {
-                public static LocString NAME = new LocString("Test Dialog");
-            }
 
+            public class INHERITANCEINFORMATION
+            {
+                public static LocString TOPTEXT = "继承详情";
+                public static LocString BUTTONTEXT = "关闭窗口";
+
+                public class ATTRIBUTESTITLE
+                {
+                    public static LocString NAME = "属性继承详情";
+                    public static LocString DESC = "以下是该复制人所继承的属性详情";
+                }
+                public class SKILLSTITLE
+                {
+                    public static LocString NAME = "技能继承详情";
+                    public static LocString DESC = "以下是该复制人所继承的技能详情";
+                }
+                public class TRAITSTITLE
+                {
+                    public static LocString NAME = "特质继承详情";
+                    public static LocString DESC = "以下是该复制人所继承的特质详情";
+
+                }
+            }
 
 
             public class INFOSCREEN
@@ -35,7 +53,6 @@ namespace EternalDecay.Content.Configs
                     public static LocString NAME = "属性知识遗产";
 
                 }
-
 
             }
         }
