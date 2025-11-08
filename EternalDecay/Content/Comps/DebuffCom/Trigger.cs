@@ -4,12 +4,15 @@ namespace EternalDecay.Content.Comps.DebuffCom
     public class Trigger : KMonoBehaviour
     {
         private KPrefabID prefabID;
+        private BreakStuff breakstuff; // 用于触发事件的实例
 
         // 当对象生成时初始化
         protected override void OnPrefabInit()
         {
             base.OnPrefabInit();
             prefabID = gameObject.GetComponent<KPrefabID>();
+            breakstuff = new BreakStuff(0.5f); // 初始化 breakstuff，设置 80% 的触发概率
+
 
         }
 
@@ -40,6 +43,8 @@ namespace EternalDecay.Content.Comps.DebuffCom
         private void Sim2000ms()
         {
             AbyssophobiaDebuff.TriggerScan(gameObject);
+
+            breakstuff.TriggerScan(gameObject);  
             // 添加具体逻辑
         }
 
@@ -48,6 +53,7 @@ namespace EternalDecay.Content.Comps.DebuffCom
         {
             // Debug.Log("当前对象为"+ gameObject.name);
             SpecializationHeatWanderer.TriggerScan(gameObject, 2); // 触发扫描，检测半径为 2
+
            
             
         }

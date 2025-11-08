@@ -60,7 +60,7 @@ namespace EternalDecay.Content.Comps.DebuffCom
                 return;
             }
 
-            // 初始化建筑物，只会执行一次
+            
             InitializeBuilding();
             if (building == null) return;
 
@@ -90,13 +90,14 @@ namespace EternalDecay.Content.Comps.DebuffCom
         }
 
 
-        // 在类初始化时（只执行一次）获取建筑物对象
+       
         private static void InitializeBuilding()
         {
-            if (building == null)
-            {
-                building = GetBuildingByID(buildingID) ?? GetBuildingByID(buildingID2);
-            }
+            building = GetBuildingByID(buildingID) ?? GetBuildingByID(buildingID2);
+            //if (building == null)
+            //{
+                
+            //}
         }
 
 
