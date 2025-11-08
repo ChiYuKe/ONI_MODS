@@ -17,7 +17,10 @@ namespace EternalDecay.Content.Comps.KUI
 
         }
 
-        public static GameObject Createpanel(string topText, List<(string attrName, int oldLevel, int newLevel)> attrList, string bottomButtonText)
+        public static GameObject Createpanel(
+            List<(string attrName, int oldLevel, int newLevel)> attrList, 
+            List<(string attrName, int oldLevel, int newLevel)> skillList,
+            List<(string attrName, int oldLevel, int newLevel)> traitList)
         {
             // 外层容器
             PPanel root = new PPanel("EDPanel")
@@ -41,14 +44,10 @@ namespace EternalDecay.Content.Comps.KUI
                 ImageMode = Image.Type.Sliced,
             }.AddChild(new PLabel("TopLabel")
             {
-                Text = topText,
+                Text = Configs.STRINGS.UI.INHERITANCEINFORMATION.TOPTEXT,
                 TextStyle = PUITuning.Fonts.TextLightStyle,
                 Margin = new RectOffset(5, 5, 5, 5)
             });
-
-
-
-
 
             // 中间滚动部分
             var middleContent = new PPanel("MiddleContent")
@@ -58,8 +57,8 @@ namespace EternalDecay.Content.Comps.KUI
                 FlexSize = new Vector2(1, 0)
             };
             middleContent.AddChild(CreateAttributeBlock(attrList));
-            middleContent.AddChild(CreateSkillBlock());
-            middleContent.AddChild(CreateTraitBlock());
+            middleContent.AddChild(CreateSkillBlock(skillList));
+            middleContent.AddChild(CreateTraitBlock(traitList));
 
             var middle = new PScrollPane("MiddleScroll")
             {
@@ -72,14 +71,6 @@ namespace EternalDecay.Content.Comps.KUI
                 BackColor = Color.white
             };
 
-
-
-
-
-
-
-
-
             // 底部按钮
             var bottom = new PPanel("Bottom")
             {
@@ -88,7 +79,7 @@ namespace EternalDecay.Content.Comps.KUI
                 FlexSize = new Vector2(1, 0),
             }.AddChild(new PButton("OkButton")
             {
-                Text = bottomButtonText,
+                Text = Configs.STRINGS.UI.INHERITANCEINFORMATION.BUTTONTEXT,
                 FlexSize = new Vector2(1, 0),
                 OnClick = new PUIDelegates.OnButtonPressed(close)
             });
@@ -97,6 +88,10 @@ namespace EternalDecay.Content.Comps.KUI
 
             return root.Build();
         }
+
+
+
+
 
         /// <summary>
         /// 创建“属性”区块 (标题 + 属性卡片列表)
@@ -119,10 +114,10 @@ namespace EternalDecay.Content.Comps.KUI
             // 标题
             wrapper.AddChild(new PLabel("AttrTitle")
             {
-                Text = "属性",
+                Text = Configs.STRINGS.UI.INHERITANCEINFORMATION.ATTRIBUTESTITLE.NAME,
                 TextStyle = CustomStyles.BigLightStyle,
 
-                ToolTip = "继承后属性变化",
+                ToolTip = Configs.STRINGS.UI.INHERITANCEINFORMATION.ATTRIBUTESTITLE.DESC,
                 TextAlignment = TextAnchor.UpperCenter,
                 Margin = new RectOffset(2, 2, 2, 4)
             });
@@ -191,7 +186,7 @@ namespace EternalDecay.Content.Comps.KUI
 
 
         // 技能列表
-        private static PPanel CreateSkillBlock() 
+        private static PPanel CreateSkillBlock(List<(string attrName, int oldLevel, int newLevel)> skillList) 
         {
             var wrapper = new PPanel("SkillWrapper")
             {
@@ -208,7 +203,9 @@ namespace EternalDecay.Content.Comps.KUI
             // 标题
             wrapper.AddChild(new PLabel("SkillTitle")
             {
-                Text = "技能",
+                Text = Configs.STRINGS.UI.INHERITANCEINFORMATION.SKILLSTITLE.NAME,
+                ToolTip = Configs.STRINGS.UI.INHERITANCEINFORMATION.SKILLSTITLE.DESC,
+
                 TextStyle = CustomStyles.BigLightStyle,
                 TextAlignment = TextAnchor.UpperCenter,
                 Margin = new RectOffset(2, 2, 2, 4)
@@ -220,7 +217,7 @@ namespace EternalDecay.Content.Comps.KUI
         }
 
         // 特质列表
-        private static PPanel CreateTraitBlock()
+        private static PPanel CreateTraitBlock(List<(string attrName, int oldLevel, int newLevel)> traitList)
         {
             var wrapper = new PPanel("TraitWrapper")
             {
@@ -236,7 +233,9 @@ namespace EternalDecay.Content.Comps.KUI
             // 标题
             wrapper.AddChild(new PLabel("TraitTitle")
             {
-                Text = "特质",
+                Text = Configs.STRINGS.UI.INHERITANCEINFORMATION.TRAITSTITLE.NAME,
+                ToolTip = Configs.STRINGS.UI.INHERITANCEINFORMATION.TRAITSTITLE.DESC,
+
                 TextStyle = CustomStyles.BigLightStyle,
                 TextAlignment = TextAnchor.UpperCenter,
                 Margin = new RectOffset(2, 2, 2, 4)
