@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using CykUtils;
 using HarmonyLib;
 using STRINGS;
 using UnityEngine;
@@ -38,10 +39,20 @@ namespace ElementExpansion
             return newTexture;
         }
 
-        public static Texture2D LoadTexture(string textureName, bool warnIfFailed = true)
+        public static Texture2D LoadTexture(string textureName, string bundle = null, bool warnIfFailed = true)
         {
-            var path = Path.Combine(TexturesPath, $"{textureName}.png");
+            Texture2D texture = null;
 
+            if (bundle != null)
+            {
+                texture = ModResources.LoadTexture(textureName, bundle);
+                if (texture == null && warnIfFailed)
+                    LogUtil.LogWarning($"AssetBundle 中找不到纹理: {textureName}");
+
+                return texture;
+            }
+
+            var path = Path.Combine(TexturesPath, $"{textureName}.png");
             if (!File.Exists(path))
             {
                 if (warnIfFailed) LogUtil.LogWarning($"纹理文件不存在: {path}");
@@ -51,7 +62,7 @@ namespace ElementExpansion
             try
             {
                 var bytes = File.ReadAllBytes(path);
-                var texture = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+                texture = new Texture2D(2, 2, TextureFormat.RGBA32, false);
 
                 if (texture.LoadImage(bytes))
                 {
@@ -68,6 +79,7 @@ namespace ElementExpansion
                 return null;
             }
         }
+
 
         public static Texture2D AdjustTextureBrightness(Texture2D texture, float brightnessMultiplier)
         {
@@ -112,11 +124,11 @@ namespace ElementExpansion
 
         #region Element Creation Helpers
 
-        public static Substance CreateSolidElement(string id, string anim, Color color,Material material = null,string texture = null, float brightness = 1f)
+        public static Substance CreateSolidElement(string id, string anim, Color color,Material material = null,string texture = null, float brightness = 1f,TextureSource source = TextureSource.Default, string bundle = null)
         {
             material ??= Assets.instance.substanceTable.solidMaterial;
             return ElementUtil.CreateAndRegisterSubstance(
-                id, Element.State.Solid, anim, material, color, texture, brightness
+                id, Element.State.Solid, anim, material, color, texture, brightness, source, bundle
             );
         }
 
@@ -157,14 +169,23 @@ namespace ElementExpansion
             return ModUtil.CreateSubstance(elementId, state, anim, material, color, uiColor, conduitColor);
         }
 
+        public enum TextureSource
+        {
+            Default,    // LoadTexture
+            AssetBundle // 从 AssetBundle 加载
+        }
+
         public static Substance CreateAndRegisterSubstance(
-         string elementId,
-         Element.State state,
-         string animName,
-         Material baseMaterial,
-         Color color,
-         string textureName = null,
-         float brightnessMultiplier = 1f)
+            string elementId,
+            Element.State state,
+            string animName,
+            Material baseMaterial,
+            Color color,
+            string textureName = null,
+            float brightnessMultiplier = 1f,
+            TextureSource source = TextureSource.Default,
+            string bundle = null 
+        )
         {
             LogUtil.Log($"开始创建物质: {elementId}");
 
@@ -180,33 +201,54 @@ namespace ElementExpansion
             var material = new Material(baseMaterial);
             material.name = $"mat{elementId}";
 
-            // 应用纹理（如果提供）
+            // 应用纹理
             if (!string.IsNullOrEmpty(textureName))
             {
-                var texture = LoadTexture(textureName);
+                Texture2D texture = null;
+
+                if (source == TextureSource.Default)
+                {
+                    texture = LoadTexture(textureName);
+                }
+                else if (source == TextureSource.AssetBundle && bundle != null)
+                {
+                    Texture2D texFromBundle = LoadTexture(textureName, bundle);
+                    if (texFromBundle != null)
+                    {
+                        texture = new Texture2D(texFromBundle.width, texFromBundle.height, TextureFormat.RGBA32, false);
+                        texture.SetPixels(texFromBundle.GetPixels());
+                        texture.Apply();
+                    }
+                    else
+                    {
+                        LogUtil.LogWarning($"AssetBundle 中找不到纹理: {textureName}");
+                    }
+
+                }
+
                 if (texture != null)
                 {
                     if (brightnessMultiplier != 1f)
-                    {
                         texture = AdjustTextureBrightness(texture, brightnessMultiplier);
-                    }
+
                     material.mainTexture = texture;
                     LogUtil.Log($"已应用纹理: {textureName}");
+                }
+                else
+                {
+                    LogUtil.LogWarning($"纹理加载失败: {textureName}");
                 }
             }
 
             // 创建物质
-            var substance = CreateSubstance(
-                elementId, state, anim, material, color, color, color
-            );
-
+            var substance = CreateSubstance(elementId, state, anim, material, color, color, color);
             if (substance == null)
             {
                 LogUtil.LogError($"物质创建失败: {elementId}");
                 return null;
             }
 
-            // 设置动画 - 这是关键步骤！
+            // 设置动画
             try
             {
                 var animsField = Traverse.Create(substance).Field("anims");
@@ -233,7 +275,7 @@ namespace ElementExpansion
             {
                 var substanceList = Assets.instance.substanceTable.GetList();
                 substanceList.Add(substance);
-                ElementLoader.FindElementByHash(substance.elementID).substance = substance;//这个非常非常非常关键
+                ElementLoader.FindElementByHash(substance.elementID).substance = substance;
                 LogUtil.Log($"物质已添加到物质表: {elementId}");
             }
             catch (Exception ex)
@@ -243,6 +285,7 @@ namespace ElementExpansion
 
             return substance;
         }
+
 
         #endregion
 

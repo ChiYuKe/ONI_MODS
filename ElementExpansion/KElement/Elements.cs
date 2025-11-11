@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CykUtils;
 using UnityEngine;
 
 namespace ElementExpansion
@@ -15,8 +16,12 @@ namespace ElementExpansion
                 "Test_element_kanim",
                 new Color32(255, 255, 255, 255),
                 null,
-                "TestElementTexture",
-                1f
+                "Test9",
+                1f,
+                ElementUtil.TextureSource.AssetBundle,
+                "KAssets"
+
+
             );
 
             // 液体元素
