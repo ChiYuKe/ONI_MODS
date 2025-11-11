@@ -47,8 +47,9 @@
       <HintPath>D:\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="PLib">
-      <HintPath>..\..\..\..\Documents\Klei\OxygenNotIncluded\mods\Dev\MinionAge\PLib.dll</HintPath>
+    <Reference Include="PLib, Version=4.17.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Managed\PLib.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -92,4 +93,8 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>"C:\Users\Administrator\Desktop\Project\NOIMods\packages\ILRepack.2.0.44\tools\ILRepack.exe" /out:"C:\Users\Administrator\Documents\Klei\OxygenNotIncluded\mods\Dev\MiniBox\MiniBox.dll" "C:\Users\Administrator\Documents\Klei\OxygenNotIncluded\mods\Dev\MiniBox\MiniBox.dll" "C:\Users\Administrator\Desktop\Project\NOIMods\Managed\PLib.dll" /lib:"C:\Users\Administrator\Desktop\Project\NOIMods\Managed"
+</PostBuildEvent>
+  </PropertyGroup>
 </Project>

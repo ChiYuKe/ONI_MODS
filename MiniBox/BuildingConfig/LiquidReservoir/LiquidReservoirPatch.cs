@@ -15,7 +15,7 @@ namespace MiniBox.BuildingConfig.LiquidReservoir
     public class LiquidReservoir_Storage_Config
     {
       
-        private static void Postfix(LiquidReservoirConfig __instance, ref GameObject go)
+        public static void Postfix(LiquidReservoirConfig __instance, ref GameObject go)
         {
             Storage storage = BuildingTemplates.CreateDefaultStorage(go, false);
             storage.capacityKg = SingletonOptions<ConfigurationItem>.Instance.LiquidReservoirCapacityKg;
@@ -30,7 +30,7 @@ namespace MiniBox.BuildingConfig.LiquidReservoir
     public class LiquidReservoirPatch
     {
 
-        private static void Postfix(LiquidReservoirConfig __instance, ref BuildingDef __result)
+        public static void Postfix(LiquidReservoirConfig __instance, ref BuildingDef __result)
         {
             __result.PermittedRotations = PermittedRotations.R360;
             __result.BuildLocationRule = BuildLocationRule.Anywhere;

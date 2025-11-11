@@ -15,7 +15,7 @@ namespace MiniBox.BuildingConfig.GasReservoir
     public class GasReservoirPatch
     {
         
-        private static void Postfix(GasReservoirConfig __instance, ref GameObject go)
+        public static void Postfix(GasReservoirConfig __instance, ref GameObject go)
         {
             Storage storage = BuildingTemplates.CreateDefaultStorage(go, false);
             storage.capacityKg = SingletonOptions<ConfigurationItem>.Instance.GasReservoirCapacityKg;
@@ -28,8 +28,8 @@ namespace MiniBox.BuildingConfig.GasReservoir
     [HarmonyPatch(typeof(GasReservoirConfig), "CreateBuildingDef")]
     public class GasReservoir_Attributes_Config
     {
-       
-        private static void Postfix(GasReservoirConfig __instance, ref BuildingDef __result)
+
+        public static void Postfix(GasReservoirConfig __instance, ref BuildingDef __result)
         {
             __result.PermittedRotations = PermittedRotations.R360;
             __result.BuildLocationRule = BuildLocationRule.Anywhere;

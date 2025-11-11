@@ -63,7 +63,7 @@ namespace MiniBox
 
             //气库
             [Option("STRINGS.CONFIGURATIONITEM.BUILDDINGS.GASRESERVOIR.CAPACITY", "kg", ConfigStrings.builddings.capacity, Format = "F0")]
-            [Limit(0, 10000000)]
+            [Limit(0, 100000)]
             [JsonProperty]
             public float GasReservoirCapacityKg { get; set; } = 20000f;
             [Option("STRINGS.CONFIGURATIONITEM.BUILDDINGS.GASRESERVOIR.FOUNDATION", "", ConfigStrings.builddings.category, Format = "F0")]
@@ -77,8 +77,8 @@ namespace MiniBox
 
 
             //液库
-            [Option("STRINGS.CONFIGURATIONITEM.BUILDDINGS.LIQUIDRESERVOIR.CAPACITY", "kg", ConfigStrings.builddings.category, Format = "F0")]
-            [Limit(0, 10000000)]
+            [Option("STRINGS.CONFIGURATIONITEM.BUILDDINGS.LIQUIDRESERVOIR.CAPACITY", "kg", ConfigStrings.builddings.capacity, Format = "F0")]
+            [Limit(0, 100000)]
             [JsonProperty]
             public float LiquidReservoirCapacityKg { get; set; } = 20000f;
             [Option("STRINGS.CONFIGURATIONITEM.BUILDDINGS.LIQUIDRESERVOIR.FOUNDATION", "", ConfigStrings.builddings.category, Format = "F0")]
