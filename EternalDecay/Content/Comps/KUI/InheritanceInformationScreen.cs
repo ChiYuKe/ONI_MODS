@@ -4,6 +4,7 @@ using PeterHan.PLib.UI;
 using System;
 using System.Collections.Generic;
 using KMod;
+using CykUtils;
 
 
 namespace EternalDecay.Content.Comps.KUI
@@ -80,6 +81,8 @@ namespace EternalDecay.Content.Comps.KUI
             }.AddChild(new PButton("OkButton")
             {
                 Text = Configs.STRINGS.UI.INHERITANCEINFORMATION.BUTTONTEXT,
+                // Sprite = ModResources.LoadSprite("Test9"),
+
                 FlexSize = new Vector2(1, 0),
                 OnClick = new PUIDelegates.OnButtonPressed(close)
             });
