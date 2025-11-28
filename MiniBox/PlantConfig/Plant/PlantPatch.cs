@@ -26,7 +26,6 @@ namespace MiniBox.PlantConfig.Plant
                 ("SpiceNut", "SpiceNut_Growth_Time", "SpiceNut_Harvest_Quantity"),
                 ("BasicFabric", "BasicFabric_Growth_Time", "BasicFabric_Harvest_Quantity"),
                 ("SwampLilyFlower", "SwampLilyFlower_Growth_Time", "SwampLilyFlower_Harvest_Quantity"),
-                ("GasGrassHarvested", "GasGrassHarvested_Growth_Time", "GasGrassHarvested_Harvest_Quantity"),
                 ("WoodLog", "WoodLog_Growth_Time", "WoodLog_Harvest_Quantity"),
                 (SimHashes.SugarWater.ToString(), "SugarWater_Growth_Time", "SugarWater_Harvest_Quantity"),
                 ("SpaceTreeBranch", "SpaceTreeBranch_Growth_Time", "SpaceTreeBranch_Harvest_Quantity"),

@@ -259,16 +259,6 @@ namespace MiniBox
             [JsonProperty]
             public int SwampLilyFlower_Harvest_Quantity { get; set; } = 2;
 
-            // === 气草 (GasGrassHarvested) ===
-            [Option(ConfigStrings.Plant.GasGrassHarvestedTitle, "", ConfigStrings.Plant.CropDurationCategory, Format = "F1")]
-            [Limit(0, 2400)]
-            [JsonProperty]
-            public float GasGrassHarvested_Growth_Time { get; set; } = 2400f;
-            [Option(ConfigStrings.Plant.GasGrassHarvestedTitle, "", ConfigStrings.Plant.NumProducedCategory, Format = "F0")]
-            [Limit(0, 100000)]
-            [JsonProperty]
-            public float GasGrassHarvested_Harvest_Quantity { get; set; } = 1;
-
             // === 木材 (WoodLog) ===
             [Option(ConfigStrings.Plant.WoodLogTitle, "", ConfigStrings.Plant.CropDurationCategory, Format = "F1")]
             [Limit(0, 2700)]
@@ -483,7 +473,6 @@ namespace MiniBox
                 public const string SpiceNutTitle = "STRINGS.CONFIGURATIONITEM.PLANTCONFIG.PLANT.SPICENUT";
                 public const string BasicFabricTitle = "STRINGS.CONFIGURATIONITEM.PLANTCONFIG.PLANT.BASICFABRIC";
                 public const string SwampLilyFlowerTitle = "STRINGS.CONFIGURATIONITEM.PLANTCONFIG.PLANT.SWAMPLILYFLOWER";
-                public const string GasGrassHarvestedTitle = "STRINGS.CONFIGURATIONITEM.PLANTCONFIG.PLANT.GASGRASSHARVESTED";
                 public const string WoodLogTitle = "STRINGS.CONFIGURATIONITEM.PLANTCONFIG.PLANT.WOODLOG";
                 public const string SugarWaterTitle = "STRINGS.CONFIGURATIONITEM.PLANTCONFIG.PLANT.SUGARWATER";
                 public const string SpaceTreeBranchTitle = "STRINGS.CONFIGURATIONITEM.PLANTCONFIG.PLANT.SPACETREEBRANCH";

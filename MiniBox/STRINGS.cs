@@ -142,8 +142,7 @@ namespace MiniBox
                     public static LocString COLDWHEATSEED = "冰霜小麦";        
                     public static LocString SPICENUT = "火椒藤";               
                     public static LocString BASICFABRIC = "顶针芦苇";          
-                    public static LocString SWAMPLILYFLOWER = "芳香百合";      
-                    public static LocString GASGRASSHARVESTED = "释气草";      
+                    public static LocString SWAMPLILYFLOWER = "芳香百合";         
                     public static LocString WOODLOG = "乔木树木材";                
                     public static LocString SUGARWATER = "糖心树蜜露";             
                     public static LocString SPACETREEBRANCH = "糖心树木材";      
