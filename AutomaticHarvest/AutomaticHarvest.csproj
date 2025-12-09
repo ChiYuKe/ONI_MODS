@@ -30,17 +30,21 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>10.0</LangVersion>
+  </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Test.cs" />
+    <Compile Include="AutomaticHarvestK.cs" />
     <Compile Include="AutomaticHarvestConfig.cs" />
     <Compile Include="AutoPlantHarvester.cs" />
     <Compile Include="KModPatch.cs" />
+    <Compile Include="KUtils\KLogUtil.cs" />
     <Compile Include="KUtils\LineOfSightUtils.cs" />
     <Compile Include="KUtils\ParabolicMover.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Reservoir.cs" />
     <Compile Include="STRINGS.cs" />
     <Compile Include="KUtils\StringUtils.cs" />
-    <Compile Include="ExplosionUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
@@ -54,6 +58,9 @@
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>D:\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="FMODUnity">
+      <HintPath>D:\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\FMODUnity.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>D:\Program Files (x86)\Steam\steamapps\common\OxygenNotIncluded\OxygenNotIncluded_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
