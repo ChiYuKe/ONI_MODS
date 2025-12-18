@@ -14,7 +14,7 @@
 | 源码目录 | Mod 名称 | 功能描述 | 获取 / 下载 |
 | :--- | :--- | :--- | :--- |
 | [**AutomaticHarvest**](./AutomaticHarvest) | 自动收获 | 优化植物收获逻辑，智能处理成熟作物。 | [Steam 订阅](https://steamcommunity.com/sharedfiles/filedetails/?id=3623778703) |
-| [**MinionAge**](./MinionAge)| 复制人年龄年龄 | 记录并显示复制人的生存天数。 | [Steam 订阅](https://steamcommunity.com/sharedfiles/filedetails/?id=3323127058) |
+| [**MinionAge**](./MinionAge)| 复制人年龄年龄 | 记录并显示复制人的生存天数，且达到目标天数死亡 | [Steam 订阅](https://steamcommunity.com/sharedfiles/filedetails/?id=3323127058) |
 | [**MinionAge_Dlc**](./MinionAge_DLC) | 复制人年龄扩展 | 对MinionAge的扩展 |  |
 | [**ElementExpansion**](./ElementExpansion) | 元素扩展 | 增加新元素或调整现有元素属性。 |  |
 | [**MoreFood**](./MoreFood) | 更多食物 | 丰富游戏内菜谱，提供更多饮食选择。 | [Steam 订阅](https://steamcommunity.com/sharedfiles/filedetails/?id=2957924585) |
