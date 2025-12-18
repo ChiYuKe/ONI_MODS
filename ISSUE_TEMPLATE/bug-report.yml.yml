@@ -1,0 +1,44 @@
+name: "🐛 Bug 反馈"
+description: "如果你在游戏中遇到了错误或 Mod 崩溃，请使用此模板"
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢你反馈 Bug！请尽可能详细地填写以下信息，以便我快速定位问题。
+  - type: input
+    id: mod_name
+    attributes:
+      label: "受影响的 Mod 名称"
+      placeholder: "例如: AutomaticHarvest, MinionAge..."
+    validations:
+      required: true
+  - type: dropdown
+    id: game_version
+    attributes:
+      label: "游戏版本"
+      options:
+        - "原版 (Vanilla)"
+        - "眼冒金星 (Spaced Out DLC)"
+        - "两者都有"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: "问题描述"
+      placeholder: "发生了什么？"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: "复现步骤"
+      placeholder: "1. 建造了... \n2. 点击了... \n3. 游戏发生了..."
+  - type: textarea
+    id: logs
+    attributes:
+      label: "错误日志 (如果有)"
+      description: "请粘贴 Player.log 中的相关部分，或者上传截图"
+      render: shell

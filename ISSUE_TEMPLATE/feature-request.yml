@@ -1,0 +1,17 @@
+name: "💡 功能建议"
+description: "为这些 Mod 提议新的想法或改进"
+title: "[Suggestion]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: feature
+    attributes:
+      label: "你的想法是什么？"
+      description: "请清晰简洁地描述你希望增加的功能。"
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: "为什么需要这个功能？"
+      description: "这会给游戏体验带来哪些提升？"
