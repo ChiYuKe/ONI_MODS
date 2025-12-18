@@ -11,14 +11,19 @@ using static STRINGS.UI.STARMAP;
 using System;
 using Satsuma.Drawing;
 using KSerialization;
+using static STRINGS.DUPLICANTS.PERSONALITIES;
+using AutomaticHarvest;
 
 
 public class AutoPlantHarvester : KMonoBehaviour
 {
-    public int radius = 8; // 扫描半径（单位：格）
+   
     public float growthSpeedMultiplier = 0.5f; // 生长加速倍率
     public List<Tag> allowedTags = new List<Tag>();
     public Vector3 storageFXOffset = Vector3.zero;
+
+    private int xmin, xmax, ymin, ymax;
+
 
 
 
@@ -29,14 +34,15 @@ public class AutoPlantHarvester : KMonoBehaviour
     [MyCmpGet]
     private LogicOperationalController operational;
 
-    [Serialize]
-    public bool isEnabled = true; // 默认启用
+    [MyCmpGet]
+    private AutomaticHarvestK automaticHarvestK;
+
+   
+
 
 
 
     private HashSet<GameObject> uniquePlants = new HashSet<GameObject>(); // 去重植物对象集合
-    private float scanInterval = 5f; // 扫描间隔时间
-
     // 是否启用调试日志（默认为关闭）
     public bool enableDebugLogs = false;
 
@@ -67,116 +73,74 @@ public class AutoPlantHarvester : KMonoBehaviour
     protected override void OnSpawn()
     {
         base.OnSpawn();
-        base.Subscribe<AutoPlantHarvester>(493375141, AutoPlantHarvester.OnRefreshUserMenuDelegate);
+       
+
+
+        // 读取可视化组件的范围
+        if (visualizer != null)
+        {
+            xmin = visualizer.RangeMin.x;
+            ymin = visualizer.RangeMin.y;
+            xmax = visualizer.RangeMax.x;
+            ymax = visualizer.RangeMax.y;
+        }
+        else  // 兜底，防止忘记挂 RangeVisualizer
+        {
+            xmin = -8; xmax = 8;
+            ymin = -3; ymax = 3;
+        }
 
 
 
         // 每 5 秒自动调用一次扫描与收获逻辑
-        InvokeRepeating(nameof(ScanAndHarvestPlants), 1f, scanInterval);
+       //  InvokeRepeating(nameof(ScanAndHarvestPlants), 1f, scanInterval);
     }
 
 
 
 
-    private static readonly EventSystem.IntraObjectHandler<AutoPlantHarvester> OnRefreshUserMenuDelegate = new EventSystem.IntraObjectHandler<AutoPlantHarvester>(delegate (AutoPlantHarvester component, object data)
-    {
-        component.OnRefreshUserMenu(data);
-    });
-    private void OnRefreshUserMenu(object data)
-    {
-        // 清空按钮
-        KIconButtonMenu.ButtonInfo emptyButton = new KIconButtonMenu.ButtonInfo("action_empty_contents", "清空内容", delegate
-        {
-            this.storage.DropAll(false, false, default(Vector3), true, null);
-        }, global::Action.NumActions, null, null, null, "清空建筑内部的容物", true);
 
-
-        KIconButtonMenu.ButtonInfo toggleButton;
-
-        if (this.isEnabled) // 如果当前是启用状态，显示“禁用”按钮
-        {
-            toggleButton = new KIconButtonMenu.ButtonInfo(
-                "action_building_disabled", // 使用一个代表关闭的图标
-                "禁用自动收割",
-                new System.Action(this.DisableHarvester), // 点击后禁用
-                global::Action.NumActions,
-                null, null, null,
-                "点击禁用，停止自动扫描和收割。",
-                true
-            );
-        }
-        else // 如果当前是禁用状态，显示“启用”按钮
-        {
-            toggleButton = new KIconButtonMenu.ButtonInfo(
-                "action_harvest", // 使用一个代表开启的图标
-                "启用自动收割",
-                new System.Action(this.EnableHarvester), // 点击后启用
-                global::Action.NumActions,
-                null, null, null,
-                "点击启用，自动扫描和收割植物。",
-                true
-            );
-        }
-
-        // 注入按钮。给开关按钮一个较高的优先级（例如 0.5f）
-        Game.Instance.userMenu.AddButton(base.gameObject, toggleButton, 0.5f);
-
-        // 注入清空按钮（保持低优先级 1f）
-        Game.Instance.userMenu.AddButton(base.gameObject, emptyButton, 1f);
-    }
-
-    // 4. 实现点击方法
-    private void EnableHarvester()
-    {
-        this.isEnabled = true;
-        // 刷新 UI，让按钮文本立即更新
-        Game.Instance.userMenu.Refresh(base.gameObject);
-    }
-
-    private void DisableHarvester()
-    {
-        this.isEnabled = false;
-        // 刷新 UI，让按钮文本立即更新
-        Game.Instance.userMenu.Refresh(base.gameObject);
-    }
 
 
     /// <summary>
-    /// 扫描范围内的植物，并执行收获逻辑
+    /// 扫描范围内的植物，返回植物的列表（根据条件返回可收获或所有植物）。
     /// </summary>
-    private void ScanAndHarvestPlants()
+    /// <param name="onlyHarvestable">如果为 true，则返回可收获的植物；如果为 false，则返回所有植物。</param>
+    /// <returns>植物的 GameObject 列表</returns>
+    public List<GameObject> ScanPlants(bool onlyHarvestable = true)
     {
-
-        // 检查自定义的开关状态
-        if (!isEnabled)
-        {
-            return;
-        }
-        // if (!operational.operational.IsOperational) {return;}
 
 
         // 获取当前建筑所在的格子索引
         int currentCell = Grid.PosToCell(transform.GetPosition());
         if (!Grid.IsValidCell(currentCell))
-            return;
+            return new List<GameObject>();
 
         // 分配临时列表资源（使用对象池以减少 GC）
         var cells = ListPool<int, AutoPlantHarvester>.Allocate();
         var plantEntries = ListPool<ScenePartitionerEntry, AutoPlantHarvester>.Allocate();
+        var allPlants = new List<GameObject>(); // 存储最终植物列表
 
         try
         {
-            // 获取当前格子为中心，半径范围内的非固体格子
-            GameUtil.GetNonSolidCells(currentCell, radius, cells);
+            // 1. 计算检测格子范围内的所有非固体格子
+            for (int dy = ymin; dy <= ymax; dy++)
+            {
+                for (int dx = xmin; dx <= xmax; dx++)
+                {
+                    int testCell = Grid.OffsetCell(currentCell, dx, dy);
+                    if (Grid.IsValidCell(testCell) && !Grid.Solid[testCell])
+                        cells.Add(testCell);
+                }
+            }
 
-            // 清空去重集合
+            // 2. 清空去重集合，收集植物条目
             uniquePlants.Clear();
-
-            // 遍历所有非固体格子，收集植物对象
             for (int i = 0; i < cells.Count; i++)
             {
                 int targetCell = cells[i];
 
+                // 检查视野遮挡
                 if (LineOfSightUtils.IsLineOfSightBlocked(currentCell, targetCell, visualizer))
                     continue;
 
@@ -184,56 +148,36 @@ public class AutoPlantHarvester : KMonoBehaviour
                 GameScenePartitioner.Instance.GatherEntries(cellX, cellY, 1, 1, GameScenePartitioner.Instance.plants, plantEntries);
             }
 
-            // 遍历所有找到的植物条目，去重
+            // 3. 遍历所有找到的植物条目，去重并检查是否满足条件
             foreach (var entry in plantEntries)
             {
                 GameObject plantGO = SafeGetGameObject(entry.obj);
-                if (plantGO != null)
-                    uniquePlants.Add(plantGO);
-            }
+                if (plantGO == null) continue;
 
-            // 遍历所有去重后的植物，进行收获 
-            foreach (GameObject plantGO in uniquePlants)
-            {
-                if (plantGO == null)
-                    continue;
+                // 去重
+                if (!uniquePlants.Add(plantGO)) continue;
 
                 Harvestable harvestable = plantGO.GetComponent<Harvestable>();
 
                 if (harvestable != null)
                 {
-                    Addvalue(plantGO, growthSpeedMultiplier);
+                    // 执行生长加速
+                    // Addvalue(plantGO, growthSpeedMultiplier);
+
                     PreventHarvestTask(plantGO);
 
-                    if (harvestable.CanBeHarvested)
+                    if (onlyHarvestable)
                     {
-                        //记录植物所在的格子
-                        int harvestCell = Grid.PosToCell(plantGO.transform.GetPosition());
-                        // 必须在 try/catch 块外捕获，以用于延迟调度
-                        int cellToStoreFrom = harvestCell;
-
-                        try
+                        // 只返回可收获的植物
+                        if (harvestable.CanBeHarvested)
                         {
-                            harvestable.Harvest(); // 执行收获逻辑，掉落物生成
-
-                            // 使用 GameScheduler 延迟执行 AutoStoreItems，将 harvestCell 作为 data 参数传入 ⭐️
-                            if (storage != null)
-                            {
-                                GameScheduler.Instance.Schedule(
-                                    "DelayedStore" + plantGO.name,
-                                    0.1f,
-                                    (System.Action<object>)AutoStoreItems, // 传入 Action<object> 类型的委托
-                                    harvestCell,  //将格子索引作为 data 参数传入
-                                    null
-                                );
-                            }
-
-
+                            allPlants.Add(plantGO);
                         }
-                        catch (System.Exception ex)
-                        {
-                            Debug.LogError($"❌ 收获失败: {plantGO.name}\n{ex}");
-                        }
+                    }
+                    else
+                    {
+                        // 返回所有植物
+                        allPlants.Add(plantGO);
                     }
                 }
             }
@@ -243,8 +187,54 @@ public class AutoPlantHarvester : KMonoBehaviour
             cells.Recycle();
             plantEntries.Recycle();
         }
+
+        return allPlants;
     }
 
+
+
+    /// <summary>
+    /// 对传入的已成熟植物列表执行收获和自动存储逻辑。
+    /// </summary>
+    public void HarvestAndStorePlants(List<GameObject> plants)
+    {
+        if (plants == null || plants.Count == 0 || storage == null)
+        {
+            return;
+        }
+
+        foreach (GameObject plantGO in plants)
+        {
+            if (plantGO == null)
+                continue;
+
+            Harvestable harvestable = plantGO.GetComponent<Harvestable>();
+
+            if (harvestable != null && harvestable.CanBeHarvested)
+            {
+                // 记录植物所在的格子，用于延迟存储
+                int harvestCell = Grid.PosToCell(plantGO.transform.GetPosition());
+
+                try
+                {
+                    harvestable.Harvest(); // 执行收获逻辑，掉落物生成
+
+                    // 延迟执行 AutoStoreItems，将 harvestCell 作为 data 参数传入 
+                    GameScheduler.Instance.Schedule(
+                        "DelayedStore" + plantGO.name,
+                        0.1f, // 延迟 0.1s 确保掉落物已生成
+                        (System.Action<object>)AutoStoreItems,
+                        harvestCell,
+                        null
+                    );
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogError($"❌ 收获失败: {plantGO.name}\n{ex}");
+                }
+            }
+        }
+    }
 
 
 
@@ -263,33 +253,6 @@ public class AutoPlantHarvester : KMonoBehaviour
             return;
 
         Grid.CellToXY(harvestCell, out int cellX, out int cellY);
-
-
-        // 计算影响范围，可以选择某个区域（比如周围3x3的格子）
-        HashSet<int> affectedCells = new HashSet<int>();
-
-        for (int dy = -1; dy <= 1; dy++)
-        {
-            for (int dx = -1; dx <= 1; dx++)
-            {
-                int currentX = cellX + dx;
-                int currentY = cellY + dy;
-
-                if (Grid.IsValidCell(Grid.XYToCell(currentX, currentY)))
-                {
-                    affectedCells.Add(Grid.XYToCell(currentX, currentY));
-                }
-            }
-        }
-        // 调用绘制声波效果
-        // DrawVisualEffect(harvestCell, affectedCells);
-
-       
-
-
-
-
-
 
         var pickupEntries = ListPool<ScenePartitionerEntry, AutoPlantHarvester>.Allocate();
 
@@ -335,8 +298,8 @@ public class AutoPlantHarvester : KMonoBehaviour
                             GameUtil.MetricMassFormat.UseThreshold, 
                             true, "{0:0.#}"),
                         pickupable.transform, 
-                        this.storageFXOffset, 
-                        1.5f, true, false, false);
+                        this.storageFXOffset + new Vector3(1,0,0), 
+                        0.2f, true, false, false);
 
 
                 }
@@ -412,6 +375,8 @@ public class AutoPlantHarvester : KMonoBehaviour
     /// <summary>
     /// 加速植物生长
     /// </summary>
+    /// 
+    [Obsolete("用于内部测试，当然你想开就直说，直接用就得了兄弟")]
     public void Addvalue(GameObject targetObject, float V)
     {
         Growing growingComponent = targetObject.GetComponent<Growing>();
@@ -447,53 +412,53 @@ public class AutoPlantHarvester : KMonoBehaviour
 
 
 
-    private static readonly HashedString[] PreAnims = new HashedString[] { "grid_pre", "grid_loop" };
-    private static readonly HashedString PostAnim = "grid_pst";
-    // 动画延迟和持续时间
-    private static readonly float DistanceDelay = 0.25f;
-    private static readonly float Duration = 3f;
+    //private static readonly HashedString[] PreAnims = new HashedString[] { "grid_pre", "grid_loop" };
+    //private static readonly HashedString PostAnim = "grid_pst";
+    //// 动画延迟和持续时间
+    //private static readonly float DistanceDelay = 0.25f;
+    //private static readonly float Duration = 3f;
 
-    // 绘制声波效果
-    private static void DrawVisualEffect(int centerCell, HashSet<int> cells)
-    {
-        // 播放声波声音
-        // SoundEvent.PlayOneShot(GlobalResources.Instance().AcousticDisturbanceSound, Grid.CellToPos(centerCell), 1f);
+    //// 绘制声波效果
+    //private static void DrawVisualEffect(int centerCell, HashSet<int> cells)
+    //{
+    //    // 播放声波声音
+    //    // SoundEvent.PlayOneShot(GlobalResources.Instance().AcousticDisturbanceSound, Grid.CellToPos(centerCell), 1f);
 
-        // 播放声波动画
-        foreach (int cell in cells)
-        {
-            int gridDistance = GetGridDistance(cell, centerCell);
-            GameScheduler.Instance.Schedule("radialgrid_pre", DistanceDelay * (float)gridDistance, new Action<object>(SpawnEffect), cell, null);
-        }
-    }
+    //    // 播放声波动画
+    //    foreach (int cell in cells)
+    //    {
+    //        int gridDistance = GetGridDistance(cell, centerCell);
+    //        GameScheduler.Instance.Schedule("radialgrid_pre", DistanceDelay * (float)gridDistance, new Action<object>(SpawnEffect), cell, null);
+    //    }
+    //}
 
-    // 生成声波动画
-    private static void SpawnEffect(object data)
-    {
-        int cell = (int)data;
-        KBatchedAnimController animController = FXHelpers.CreateEffect("radialgrid_kanim", Grid.CellToPosCCC(cell, Grid.SceneLayer.FXFront), null, false, Grid.SceneLayer.FXFront, false);
-        // 设置动画颜色为红色 (RGBA: 255, 0, 0, 255)
-        animController.TintColour = new Color32(255, 0, 0, 200);
-        animController.destroyOnAnimComplete = false;
-        animController.Play(PreAnims, KAnim.PlayMode.Loop);
-        GameScheduler.Instance.Schedule("radialgrid_loop", Duration, new Action<object>(DestroyEffect), animController, null);
-    }
+    //// 生成声波动画
+    //private static void SpawnEffect(object data)
+    //{
+    //    int cell = (int)data;
+    //    KBatchedAnimController animController = FXHelpers.CreateEffect("radialgrid_kanim", Grid.CellToPosCCC(cell, Grid.SceneLayer.FXFront), null, false, Grid.SceneLayer.FXFront, false);
+    //    // 设置动画颜色为红色 (RGBA: 255, 0, 0, 255)
+    //    animController.TintColour = new Color32(255, 0, 0, 200);
+    //    animController.destroyOnAnimComplete = false;
+    //    animController.Play(PreAnims, KAnim.PlayMode.Loop);
+    //    GameScheduler.Instance.Schedule("radialgrid_loop", Duration, new Action<object>(DestroyEffect), animController, null);
+    //}
 
-    // 销毁声波动画
-    private static void DestroyEffect(object data)
-    {
-        KBatchedAnimController animController = (KBatchedAnimController)data;
-        animController.destroyOnAnimComplete = true;
-        animController.Play(PostAnim, KAnim.PlayMode.Once, 1f, 0f);
-    }
+    //// 销毁声波动画
+    //private static void DestroyEffect(object data)
+    //{
+    //    KBatchedAnimController animController = (KBatchedAnimController)data;
+    //    animController.destroyOnAnimComplete = true;
+    //    animController.Play(PostAnim, KAnim.PlayMode.Once, 1f, 0f);
+    //}
 
-    // 计算两个单元格之间的网格距离
-    private static int GetGridDistance(int cell, int centerCell)
-    {
-        Vector2I cellPos = Grid.CellToXY(cell);
-        Vector2I centerPos = Grid.CellToXY(centerCell);
-        return Math.Abs(cellPos.x - centerPos.x) + Math.Abs(cellPos.y - centerPos.y);
-    }
+    //// 计算两个单元格之间的网格距离
+    //private static int GetGridDistance(int cell, int centerCell)
+    //{
+    //    Vector2I cellPos = Grid.CellToXY(cell);
+    //    Vector2I centerPos = Grid.CellToXY(centerCell);
+    //    return Math.Abs(cellPos.x - centerPos.x) + Math.Abs(cellPos.y - centerPos.y);
+    //}
 
 
 }

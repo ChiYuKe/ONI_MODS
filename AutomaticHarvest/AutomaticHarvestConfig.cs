@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TUNING;
 using UnityEngine;
 
+
 namespace AutomaticHarvest
 {
     public class AutomaticHarvestConfig : IBuildingConfig
@@ -13,7 +14,7 @@ namespace AutomaticHarvest
             string text = "AutomaticHarvestConfig";
             int num = 1;
             int num2 = 1;
-            string text2 = "testanim_kanim";//"thermalblock_kanim";testanim_kanim
+            string text2 = "AutomaticHarvest_kanim";//"thermalblock_kanim";testanim_kanim
             int num3 = 30;
             float num4 = 120f;
             float[] tier = BUILDINGS.CONSTRUCTION_MASS_KG.TIER5;
@@ -26,14 +27,22 @@ namespace AutomaticHarvest
             buildingDef.Entombable = false;
             buildingDef.Overheatable = false;
             buildingDef.AudioCategory = "Metal";
-            buildingDef.BaseTimeUntilRepair = -1f;
-
-            buildingDef.RequiresPowerInput = true;// 电力需求
-            buildingDef.EnergyConsumptionWhenActive = 120f;
-            buildingDef.SelfHeatKilowattsWhenActive = 2f;
+            buildingDef.RequiresPowerInput = true;
+            buildingDef.AddLogicPowerPort = false;
+            buildingDef.EnergyConsumptionWhenActive = 120f;     
+            buildingDef.SelfHeatKilowattsWhenActive = 1f;
             buildingDef.PowerInputOffset = new CellOffset(0, 0);
 
-            buildingDef.LogicInputPorts = LogicOperationalController.CreateSingleInputPortList(new CellOffset(0, 0));
+            buildingDef.LogicOutputPorts = new List<LogicPorts.Port> {
+                LogicPorts.Port.OutputPort(
+                    AutomaticHarvestLogic.PORT_ID,
+                    new CellOffset(0, 0),
+                    STRINGS.BUILDINGS.AUTOMATICHARVESTCONFIG.LOGIC_PORT,
+                    STRINGS.BUILDINGS.AUTOMATICHARVESTCONFIG.LOGIC_PORT_ACTIVE,
+                    STRINGS.BUILDINGS.AUTOMATICHARVESTCONFIG.LOGIC_PORT_INACTIVE,
+                    false,
+                    false)
+            };
 
 
             buildingDef.OutputConduitType = ConduitType.Solid;
@@ -53,19 +62,26 @@ namespace AutomaticHarvest
 
         public override void ConfigureBuildingTemplate(GameObject go, Tag prefab_tag)
         {
-            go.AddTag("testRed");
+            go.AddTag("AutomaticHarvest");
             BuildingConfigManager.Instance.IgnoreDefaultKComponent(typeof(RequiresFoundation), prefab_tag);
 
             GeneratedBuildings.MakeBuildingAlwaysOperational(go);
 
             AddVisualizer(go, false);
             go.AddComponent<AutoPlantHarvester>();
+            go.AddOrGet<AutomaticHarvestK>();
             go.AddOrGet<Reservoir>();
+            go.AddOrGet<AutomaticHarvestLogic>();
+            go.AddOrGet<Rotatable>();
+            
 
 
+
+            //Operational operational = go.AddOrGet<Operational>();
+            //operational.SetFlag(new Operational.Flag("output_conduit", Operational.Flag.Type.Functional), true);
 
             Storage storage = go.AddOrGet<Storage>();
-            storage.capacityKg = 20000f; 
+            storage.capacityKg = 20000f;
 
             //设置 storageFilters 允许存储收获物和种子
             storage.storageFilters = new List<Tag>
@@ -81,7 +97,7 @@ namespace AutomaticHarvest
             });
 
             // 阻止复制人从该存储中拿走物品
-            storage.allowItemRemoval = false;
+            storage.allowItemRemoval = true;
 
             // 启用在建筑上方世界空间（World Space）显示的容量状态图标（Status Item）
             storage.showCapacityStatusItem = true;
@@ -93,11 +109,18 @@ namespace AutomaticHarvest
 
         public override void DoPostConfigureComplete(GameObject go)// 建造配置
         {
-            // go.AddOrGet<EnergyConsumer>();
-            // go.AddOrGet<Automatable>();
+           
+            go.AddOrGet<EnergyConsumer>();
+            go.AddOrGet<SolidConduitDispenserK>();
+            go.AddOrGet<Operational>();
+
+
+
+
+            go.AddOrGet<Automatable>();
             // go.AddOrGet<TreeFilterable>();
-            go.AddOrGet<SolidConduitDispenser>();
-            go.AddOrGet<LogicOperationalController>();
+
+            // go.AddOrGet<LogicOperationalController>();
 
         }
 
